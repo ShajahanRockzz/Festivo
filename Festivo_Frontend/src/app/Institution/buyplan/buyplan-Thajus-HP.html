@@ -1,0 +1,171 @@
+<div class="buyplan-container fade-in-up">
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div [ngClass]="'modal-message ' + (modalData.type === 'error' ? 'error-modal' : 'success-modal')">
+        <div class="modal-icon">{{ modalData.type === 'error' ? '❌' : '✓' }}</div>
+        <h2 class="modal-title">{{ modalData.title }}</h2>
+        <p class="modal-text">{{ modalData.message }}</p>
+        <button class="modal-btn neon-btn" (click)="closeModal()">{{ modalData.type === 'success' ? 'Continue' : 'Close' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div *ngIf="showPaymentModal" class="payment-modal-overlay" (click)="closePaymentModal()">
+    <div class="payment-modal-content" (click)="$event.stopPropagation()">
+      <div class="payment-modal-header">
+        <h2>Complete Payment</h2>
+        <button class="close-btn neon-btn" (click)="closePaymentModal()">✕</button>
+      </div>
+
+      <div class="payment-modal-body">
+        <div class="plan-summary">
+          <h3>{{ getSelectedPlanName() }} Plan</h3>
+          <p class="amount">₹{{ getSelectedPlanAmount() }}</p>
+        </div>
+
+        <form (ngSubmit)="processPayment()">
+          <!-- Cardholder Name -->
+          <div class="form-group">
+            <label for="cardholderName" class="form-label">Cardholder Name <span class="required">*</span></label>
+            <input
+              type="text"
+              id="cardholderName"
+              class="form-input"
+              [class.input-error]="paymentErrors['cardHolderName']"
+              placeholder="Enter full name"
+              [(ngModel)]="paymentData.cardHolderName"
+              name="cardholderName"
+              (blur)="validateCardHolderName()"
+              (input)="validateCardHolderName()"
+            />
+            <small *ngIf="paymentErrors['cardHolderName']" class="field-error">{{ paymentErrors['cardHolderName'] }}</small>
+          </div>
+
+          <!-- Card Number -->
+          <div class="form-group">
+            <label for="cardNumber" class="form-label">Card Number <span class="required">*</span></label>
+            <input
+              type="text"
+              id="cardNumber"
+              class="form-input"
+              [class.input-error]="paymentErrors['cardNumber']"
+              placeholder="1234 5678 9012 3456"
+              [(ngModel)]="paymentData.cardNumber"
+              name="cardNumber"
+              maxlength="19"
+              (input)="formatCardNumber($event); validateCardNumber()"
+              (blur)="validateCardNumber()"
+            />
+            <small *ngIf="paymentErrors['cardNumber']" class="field-error">{{ paymentErrors['cardNumber'] }}</small>
+          </div>
+
+          <!-- Expiry Date and CVV -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiryDate" class="form-label">Expiry Date <span class="required">*</span></label>
+              <input
+                type="text"
+                id="expiryDate"
+                class="form-input"
+                [class.input-error]="paymentErrors['expiryDate']"
+                placeholder="MM/YY"
+                [(ngModel)]="paymentData.expiryDate"
+                name="expiryDate"
+                maxlength="5"
+                (input)="formatExpiryDate($event); validateExpiryDate()"
+                (blur)="validateExpiryDate()"
+              />
+              <small *ngIf="paymentErrors['expiryDate']" class="field-error">{{ paymentErrors['expiryDate'] }}</small>
+            </div>
+
+            <div class="form-group">
+              <label for="cvv" class="form-label">CVV <span class="required">*</span></label>
+              <input
+                type="password"
+                id="cvv"
+                class="form-input"
+                [class.input-error]="paymentErrors['cvv']"
+                placeholder="123"
+                [(ngModel)]="paymentData.cvv"
+                name="cvv"
+                maxlength="3"
+                (input)="validateCvv()"
+                (blur)="validateCvv()"
+              />
+              <small *ngIf="paymentErrors['cvv']" class="field-error">{{ paymentErrors['cvv'] }}</small>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary neon-btn" (click)="closePaymentModal()">Cancel</button>
+            <button 
+              type="submit" 
+              class="btn-primary neon-btn"
+              [disabled]="isLoading"
+            >
+              <span *ngIf="!isLoading">Pay Now</span>
+              <span *ngIf="isLoading">Processing...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Choose Your Plan</h1>
+    <p class="subtitle">Select a plan to publish your festivals and manage competitions</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && plans.length === 0" class="loading-container fade-in-up">
+    <div class="spinner"></div>
+    <p>Loading plans...</p>
+  </div>
+
+  <!-- Plans Grid -->
+  <div *ngIf="!isLoading && plans.length > 0" class="plans-grid">
+    <div *ngFor="let plan of plans" class="plan-card bento-card">
+      <div class="plan-header">
+        <h3 class="plan-name">{{ plan.plan_name }}</h3>
+        <div class="plan-duration">{{ plan.days }} Days</div>
+      </div>
+
+      <div class="plan-price">
+        <span class="currency">₹</span>
+        <span class="amount">{{ plan.amount }}</span>
+      </div>
+
+      <div class="plan-description">
+        {{ plan.description }}
+      </div>
+
+      <ul class="plan-features">
+        <li>✓ Create up to 10 festivals</li>
+        <li>✓ Manage competitions</li>
+        <li>✓ Track registrations</li>
+        <li>✓ Email support</li>
+        <li *ngIf="plan.days >= 150">✓ Priority support</li>
+        <li *ngIf="plan.days >= 365">✓ Dedicated account manager</li>
+      </ul>
+
+      <button 
+        class="btn-select-plan neon-btn"
+        (click)="selectPlan(plan.plan_id)"
+      >
+        Select Plan
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && plans.length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h2>No Plans Available</h2>
+    <p>Currently, there are no plans available. Please try again later.</p>
+  </div>
+</div>

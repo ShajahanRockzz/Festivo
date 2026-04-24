@@ -1,0 +1,1 @@
+const fs = require('fs'); const file = 'routes/fest.js'; let content = fs.readFileSync(file, 'utf8'); content = content.replace(/i.email as institution_email, i.address as institution_address,[^c]+/, 'i.institution_email, i.institution_address, i.institution_contactno as institution_contact, '); fs.writeFileSync(file, content);

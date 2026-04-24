@@ -1,0 +1,105 @@
+<div class="coordinatormaster-container fade-in-up">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <button class="toggle-sidebar-btn neon-btn" (click)="toggleSidebar()" title="Toggle Sidebar">☰</button>
+      <div class="logo">
+        <span class="logo-icon">🎭</span>
+        <span class="logo-text">Festivo</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <span class="role-badge">Coordinator</span>
+    </div>
+
+    <div class="header-right">
+      <div class="user-profile-container fade-in-up">
+        <button class="user-profile-btn neon-btn" [class.open]="userProfileOpen" (click)="toggleUserProfile()" [title]="coordinatorName">
+          <span class="profile-icon">👤</span>
+          <span class="profile-name">{{ coordinatorName }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+
+        <div *ngIf="userProfileOpen" class="profile-dropdown">
+          <a routerLink="/coordinatormaster/coordinatorhome" class="dropdown-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a routerLink="/coordinatormaster/settings" class="dropdown-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+          <hr class="dropdown-divider" />
+          <button class="dropdown-item logout-btn neon-btn" (click)="logout()">
+            <span class="icon">🚪</span> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container fade-in-up">
+    <!-- Sidebar -->
+    <aside class="sidebar" [class.collapsed]="!sidebarOpen">
+      <nav class="nav-menu">
+        <div *ngFor="let item of menuItems" class="nav-item">
+          <button
+            *ngIf="!item.submenu"
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+          </button>
+
+          <div *ngIf="item.submenu" class="nav-menu-group">
+            <button class="nav-link submenu-toggle" (click)="toggleMenu(item)">
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+              <span class="submenu-arrow" *ngIf="sidebarOpen" [class.expanded]="item.expanded">▼</span>
+            </button>
+
+            <div class="submenu" *ngIf="item.expanded && sidebarOpen">
+              <button
+                *ngFor="let subitem of item.submenu"
+                class="nav-link submenu-link"
+                [routerLink]="subitem.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+              >
+                <span class="nav-icon">{{ subitem.icon }}</span>
+                <span class="nav-label">{{ subitem.label }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <h3>Festivo Coordinator Platform</h3>
+        <p>Manage your events efficiently</p>
+      </div>
+      <div class="footer-links">
+        <a href="#help">Help</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+      </div>
+      <div class="footer-right">
+        <p>&copy; 2024-2025 Festivo. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+

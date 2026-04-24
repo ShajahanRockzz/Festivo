@@ -1,0 +1,140 @@
+<div class="view-plan-container fade-in-up">
+  <!-- Message Modal/Popup -->
+  <div *ngIf="showMessageModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div *ngIf="errorMessage" class="modal-message error-modal">
+        <div class="modal-icon">✖</div>
+        <h2 class="modal-title">Error</h2>
+        <p class="modal-text">{{ errorMessage }}</p>
+        <button class="modal-btn neon-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+
+      <div *ngIf="successMessage" class="modal-message success-modal">
+        <div class="modal-icon">✓</div>
+        <h2 class="modal-title">Success</h2>
+        <p class="modal-text">{{ successMessage }}</p>
+        <button class="modal-btn neon-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-message warning-modal">
+        <div class="modal-icon">⚠️</div>
+        <h2 class="modal-title">Delete Plan</h2>
+        <p class="modal-text">
+          Are you sure you want to delete the plan "<strong>{{ planToDelete?.plan_name }}</strong>"? This action cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="modal-btn btn-danger neon-btn" (click)="onDeleteConfirm()">DELETE</button>
+          <button class="modal-btn btn-cancel neon-btn" (click)="closeDeleteModal()">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <button class="back-nav-btn neon-btn" (click)="goBack()" title="Go back">← BACK</button>
+    <div class="header-content">
+      <h1>Subscription Plans</h1>
+      <p class="subtitle">Manage your festival subscription plans</p>
+    </div>
+    <button class="create-btn neon-btn" (click)="createNewPlan()" title="Create new plan">
+      <span>➕ NEW PLAN</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading plans...</p>
+    </div>
+  </div>
+
+  <!-- Plans Content -->
+  <div *ngIf="!isLoading" class="plans-content">
+    <!-- Search Bar -->
+    <div class="search-container fade-in-up">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search plans by name, description, days, or amount..."
+        [(ngModel)]="searchQuery"
+        (keyup)="filterPlans()"
+        name="search"
+      />
+      <button
+        class="clear-search-btn neon-btn" 
+        *ngIf="searchQuery"
+        (click)="clearSearch()"
+        title="Clear search">
+        ✖
+      </button>
+    </div>
+
+    <!-- No Plans Message -->
+    <div *ngIf="filteredPlans.length === 0" class="no-plans bento-card">
+      <div class="no-plans-icon">📦</div>
+      <h3>No Plans Found</h3>
+      <p *ngIf="searchQuery">
+        No plans match your search criteria. Try adjusting your search.
+      </p>
+      <p *ngIf="!searchQuery">
+        No subscription plans yet. Create your first plan to get started.
+      </p>
+      <button class="btn-primary neon-btn" (click)="createNewPlan()" *ngIf="!searchQuery" style="margin-top: 16px;">
+        Create First Plan
+      </button>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="plans-grid" *ngIf="filteredPlans.length > 0">
+      <div *ngFor="let plan of filteredPlans" class="pricing-card-mockup">
+        
+        <!-- Plan Header -->
+        <div class="pricing-card-header">
+          <span class="pricing-card-name">{{ plan.plan_name }}</span>
+        </div>
+
+        <!-- Plan Price -->
+        <div class="pricing-card-price">
+          <span class="price-symbol">₹</span>
+          <span class="price-amount">{{ plan.amount }}</span>
+          <span class="price-duration">/ {{ plan.days }} days</span>
+        </div>
+        
+        <div class="pricing-card-divider"></div>
+
+        <!-- Plan Description -->
+        <div class="pricing-card-body">
+          <p class="pricing-card-desc">{{ plan.description }}</p>
+        </div>
+
+        <!-- Plan Actions -->
+        <div class="plan-actions">
+          <button
+            class="btn-edit neon-btn"
+            (click)="onEditClick(plan)"
+            title="Edit plan">
+            ✏️ Edit
+          </button>
+          <button
+            class="btn-delete"
+            (click)="openDeleteModal(plan)"
+            title="Delete plan">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="results-info" *ngIf="filteredPlans.length > 0">
+      <small>Showing {{ filteredPlans.length }} of {{ plans.length }} plan(s)</small>
+    </div>
+  </div>
+</div>

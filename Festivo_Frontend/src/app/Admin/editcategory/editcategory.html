@@ -1,0 +1,145 @@
+<div class="edit-category-container">
+  <!-- Message Modal/Popup -->
+  <div *ngIf="showMessageModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div *ngIf="errorMessage" class="modal-message error-modal">
+        <div class="modal-icon">✕</div>
+        <h2 class="modal-title">Error</h2>
+        <p class="modal-text">{{ errorMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+
+      <div *ngIf="successMessage" class="modal-message success-modal">
+        <div class="modal-icon">✓</div>
+        <h2 class="modal-title">Success</h2>
+        <p class="modal-text">{{ successMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading category...</p>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div *ngIf="!isLoading" class="page-header">
+    <button class="back-btn" (click)="goBack()" title="Go back">← BACK</button>
+    <div class="header-content">
+      <h1>Edit Category</h1>
+      <p class="subtitle">Update festival category information</p>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div *ngIf="!isLoading" class="form-wrapper">
+    <div class="form-card">
+      <!-- Form -->
+      <form (ngSubmit)="submitForm()" #categoryForm="ngForm">
+        <!-- Category Name Field -->
+        <div class="form-group">
+          <label for="categoryName" class="form-label">Category Name <span class="required">*</span></label>
+          <input
+            type="text"
+            id="categoryName"
+            class="form-input"
+            placeholder="Enter category name"
+            [(ngModel)]="categoryData.category_name"
+            name="category_name"
+            required
+            minlength="3"
+            maxlength="100"
+          />
+          <small class="form-helper">Category name should be 3-100 characters</small>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-group">
+          <label for="description" class="form-label">Description <span class="required">*</span></label>
+          <textarea
+            id="description"
+            class="form-textarea"
+            placeholder="Enter category description"
+            [(ngModel)]="categoryData.category_description"
+            name="category_description"
+            required
+            minlength="10"
+            maxlength="500"
+            rows="5"
+          ></textarea>
+          <small class="form-helper">Description should be 10-500 characters</small>
+        </div>
+
+        <!-- Category Image Field -->
+        <div class="form-group">
+          <label for="categoryImage" class="form-label">Category Image <span class="required">*</span></label>
+          <div class="image-upload-wrapper">
+            <input
+              type="file"
+              id="categoryImage"
+              class="file-input"
+              (change)="onImageSelected($event)"
+              accept="image/*"
+              #imageInput
+            />
+            <label for="categoryImage" class="file-input-label">
+              <span class="upload-icon">📤</span>
+              <span class="upload-text">Click to upload or drag & drop</span>
+              <span class="upload-hint">PNG, JPG, GIF up to 5MB</span>
+            </label>
+          </div>
+          <small class="form-helper">Upload a new image or keep the existing one</small>
+        </div>
+
+        <!-- Image Preview -->
+        <div *ngIf="imagePreview" class="image-preview-wrapper">
+          <div class="preview-container">
+            <img [src]="imagePreview" alt="Category preview" class="preview-image" />
+            <button
+              type="button"
+              class="remove-image-btn"
+              (click)="removeImage()"
+              title="Remove image"
+            >
+              ✕
+            </button>
+          </div>
+          <p class="preview-filename">{{ selectedFileName }}</p>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="isSaving || !categoryForm.valid"
+          >
+            <span *ngIf="!isSaving">Update Category</span>
+            <span *ngIf="isSaving">Updating...</span>
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="goBack()"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <!-- Category Information -->
+      <div class="info-box">
+        <h3>Category Information</h3>
+        <ul class="info-list">
+          <li>Category name and description are visible to participants</li>
+          <li>Ensure accurate details to represent your festival event</li>
+          <li>You can update this information at any time</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

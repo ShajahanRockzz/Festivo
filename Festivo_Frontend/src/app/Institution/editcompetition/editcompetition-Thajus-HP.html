@@ -1,0 +1,203 @@
+<div class="edit-competition-container fade-in-up">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn neon-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div>
+      <h1>Edit Competition</h1>
+      <p class="subtitle" *ngIf="festName">for {{ festName }}</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container fade-in-up">
+    <i class="fas fa-spinner fa-spin spinner"></i>
+    <p>Loading competition details...</p>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!isLoading" class="form-container fade-in-up">
+    <form (ngSubmit)="updateCompetition()" class="competition-form">
+      
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-banner">
+        <i class="fas fa-exclamation-circle error-icon"></i>
+        <span class="error-text">{{ errorMessage }}</span>
+      </div>
+
+      <!-- Competition Name -->
+      <div class="form-group">
+        <label for="comp-name">Competition Name *</label>
+        <input
+          id="comp-name"
+          type="text"
+          [(ngModel)]="competition.competition_name"
+          name="competition_name"
+          placeholder="Enter competition name"
+          [class.error]="fieldErrors['competition_name']"
+          required
+        />
+        <span *ngIf="fieldErrors['competition_name']" class="field-error">
+          <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['competition_name'] }}
+        </span>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          [(ngModel)]="competition.description"
+          name="description"
+          placeholder="Enter competition description (at least 10 characters)"
+          rows="4"
+          [class.error]="fieldErrors['description']"
+        ></textarea>
+        <span *ngIf="fieldErrors['description']" class="field-error">
+          <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['description'] }}
+        </span>
+      </div>
+
+      <!-- Image -->
+      <div class="form-group">
+        <label for="image">Competition Image (Optional)</label>
+        
+        <div *ngIf="imagePreviewUrl" class="current-image-preview">
+          <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 8px;">
+            {{ selectedImageFile ? 'New Image Preview:' : 'Current Image:' }}
+          </p>
+          <img [src]="imagePreviewUrl" alt="Competition Image Preview" />
+        </div>
+
+        <div class="upload-area">
+          <label class="upload-btn neon-btn">
+            <i class="fas fa-cloud-upload-alt"></i> Choose New Image
+            <input
+              type="file"
+              id="image"
+              (change)="onImageSelected($event)"
+              accept="image/*"
+              style="display: none;"
+            />
+          </label>
+          <div *ngIf="selectedImageFile" class="file-name">
+            <i class="fas fa-file-image"></i> {{ selectedImageFile.name }}
+          </div>
+          <span *ngIf="fieldErrors['image']" class="field-error" style="justify-content: center; margin-top: 12px;">
+            <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['image'] }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Type -->
+        <div class="form-group">
+          <label for="type">Type *</label>
+          <select
+            id="type"
+            [(ngModel)]="competition.type"
+            name="type"
+            (change)="onTypeChange()"
+            [class.error]="fieldErrors['type']"
+          >
+            <option value="single">Single</option>
+            <option value="group">Group</option>
+          </select>
+        </div>
+
+        <!-- Competition Date -->
+        <div class="form-group">
+          <label for="comp-date">Competition Date *</label>
+          <input
+            id="comp-date"
+            type="date"
+            [(ngModel)]="competition.competition_date"
+            name="competition_date"
+            [min]="minDate"
+            [class.error]="fieldErrors['competition_date']"
+          />
+          <span *ngIf="fieldErrors['competition_date']" class="field-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['competition_date'] }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Min Members -->
+        <div class="form-group">
+          <label for="min-members">Min Members Per Group *</label>
+          <input
+            id="min-members"
+            type="number"
+            [(ngModel)]="competition.min_members"
+            name="min_members"
+            [disabled]="competition.type === 'single'"
+            [class.error]="fieldErrors['min_members']"
+          />
+          <span *ngIf="fieldErrors['min_members']" class="field-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['min_members'] }}
+          </span>
+        </div>
+
+        <!-- Max Members -->
+        <div class="form-group">
+          <label for="max-members">Max Members Per Group *</label>
+          <input
+            id="max-members"
+            type="number"
+            [(ngModel)]="competition.max_members"
+            name="max_members"
+            [disabled]="competition.type === 'single'"
+            [class.error]="fieldErrors['max_members']"
+          />
+          <span *ngIf="fieldErrors['max_members']" class="field-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['max_members'] }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Group Limit / Participant Limit -->
+        <div class="form-group">
+          <label for="group-limit">
+            {{ competition.type === 'single' ? 'Max Participants Allowed *' : 'Max Groups Allowed *' }}
+          </label>
+          <input
+            id="group-limit"
+            type="number"
+            [(ngModel)]="competition.grouplimit"
+            name="grouplimit"
+            [class.error]="fieldErrors['grouplimit']"
+          />
+          <span *ngIf="fieldErrors['grouplimit']" class="field-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ fieldErrors['grouplimit'] }}
+          </span>
+        </div>
+
+        <!-- Registration Fee -->
+        <div class="form-group">
+          <label for="reg-fee">Registration Fee (₹)</label>
+          <input
+            id="reg-fee"
+            type="number"
+            [(ngModel)]="competition.reg_fee"
+            name="reg_fee"
+            min="0"
+            [class.error]="fieldErrors['reg_fee']"
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel neon-btn" (click)="goBack()">Cancel</button>
+        <button type="submit" class="btn-submit neon-btn" [disabled]="isSaving">
+          <i class="fas" [ngClass]="isSaving ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+          {{ isSaving ? 'Updating...' : 'Update Competition' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

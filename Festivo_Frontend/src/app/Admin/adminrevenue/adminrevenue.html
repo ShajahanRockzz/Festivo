@@ -1,0 +1,54 @@
+<div class="revenue-container">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1>Admin Revenue Report</h1>
+      <p>Overview of revenue generated exclusively from Institution Subscriptions</p>
+    </div>
+    <div class="export-actions">
+      <button class="btn-export pdf" (click)="exportToPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+      <button class="btn-export excel" (click)="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+    </div>
+  </div>
+  
+  <div class="summary-cards" style="grid-template-columns: 1fr; max-width: 500px; margin-bottom: 30px;">
+    <div class="card total">
+      <div class="card-icon"><i class="fa-solid fa-building"></i></div>
+      <div class="card-info">
+        <h3>Total Admin Revenue (Subscriptions)</h3>
+        <h2 style="font-size: 32px">₹{{ subscriptionRevenue | number:'1.2-2' }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>Subscription Revenue per Institution</h3>
+      <div class="chart-wrapper pie">
+        <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="pieChartType"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Top Subscribing Institutions</h3>
+      <div class="chart-wrapper bar">
+        <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="barChartType"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-table-container">
+    <h3>Subscription Transactions</h3>
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead><tr><th>Date</th><th>Institution/Source</th><th>Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let item of history">
+            <td>{{ item.payment_date | date:'mediumDate' }}</td>
+            <td><strong>{{ item.institution_name }}</strong></td>
+            <td class="amount" style="color: #059669;">+ ₹{{ item.amount | number:'1.2-2' }}</td>
+          </tr>
+          <tr *ngIf="history.length === 0"><td colspan="3" class="text-center">No subscription transactions found</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

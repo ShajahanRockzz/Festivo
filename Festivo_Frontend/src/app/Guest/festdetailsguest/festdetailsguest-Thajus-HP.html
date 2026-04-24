@@ -1,0 +1,133 @@
+<section class="fest-details-section">
+  <div class="container fade-in-up">
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <h3>Loading Fest Details...</h3>
+    </div>
+
+    <div *ngIf="!isLoading && festDetails">
+      
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <img [src]="getImageUrl(festDetails.fest_image, 'fest')" [alt]="festDetails.fest_name">
+        <div class="overlay">
+          <span class="category-badge">{{ festDetails.category_name || 'General' }}</span>
+          <h1>{{ festDetails.fest_name }}</h1>
+          <div class="date-range">
+            <i class="feather icon-calendar"></i> 
+            {{ festDetails.startdate | date:'longDate' }} - {{ festDetails.enddate | date:'longDate' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="content-grid">
+        
+        <!-- Left: Main Details & Competitions -->
+        <div class="main-content">
+          <div class="about-section">
+            <h2>About The Festival</h2>
+            <p>{{ festDetails.fest_description }}</p>
+            <div style="margin-top: 20px;" *ngIf="festDetails.brochure">
+              <a [href]="getBrochureUrl(festDetails.brochure)" target="_blank" class="btn btn-primary neon-btn">
+                <i class="feather icon-download"></i> Download Brochure
+              </a>
+            </div>
+          </div>
+
+          <div class="competitions-section">
+            <h2>Available Competitions ({{ competitions.length }})</h2>
+            
+            <div class="no-data" *ngIf="competitions.length === 0" style="color: #888;">
+              <p>No competitions have been published for this fest yet.</p>
+            </div>
+
+            <div class="comps-grid" *ngIf="competitions.length > 0">
+              <div class="comp-card bento-card" *ngFor="let comp of competitions">
+                <div class="comp-img-wrapper grid-wrapper">
+                  <img [src]="getImageUrl(comp.image, 'comp')">
+                </div>
+                <div class="comp-info">
+                  <h4>{{ comp.competition_name }}</h4>
+                  <div class="comp-meta">
+                    <span><i class="feather icon-users"></i> {{ comp.type | titlecase }}</span>
+                    <span><i class="feather icon-credit-card bento-card"></i> Rs {{ comp.reg_fee }}</span>
+                  </div>
+                  <div class="comp-meta" style="margin-bottom: 20px;">
+                     <span><i class="feather icon-calendar"></i> {{ comp.competition_date | date:'MMM dd, yyyy' }}</span>
+                  </div>
+                  <!-- Optional: future add a direct "Register" button here routing to participant login -->
+                  <button class="btn-outline neon-btn" (click)="openRegisterModal()">Register to Participate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Institution & Meta Info -->
+        <div class="sidebar">
+          
+          <div class="info-card bento-card">
+            <h3>Institution Details</h3>
+            <ul class="info-list grid-wrapper">
+              <li>
+                <i class="feather icon-briefcase"></i>
+                <span class="val">
+                  <strong>Organized By</strong>
+                  {{ festDetails.institution_name }}
+                </span>
+              </li>
+              <li>
+                <i class="feather icon-mail"></i>
+                <span class="val">
+                  <strong>Email</strong>
+                  {{ festDetails.institution_email }}
+                </span>
+              </li>
+              <li>
+                <i class="feather icon-phone"></i>
+                <span class="val">
+                  <strong>Contact</strong>
+                  {{ festDetails.institution_contact }}
+                </span>
+              </li>
+              <li>
+                <i class="feather icon-map-pin"></i>
+                <span class="val">
+                  <strong>Address</strong>
+                  {{ festDetails.institution_address }} <br>
+                  PIN: {{ festDetails.institution_pincode }}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="info-card bento-card">
+            <h3>Event Info</h3>
+            <ul class="info-list grid-wrapper">
+              <li>
+                <i class="feather icon-info"></i>
+                <span class="val">
+                  <strong>Who Can Participate</strong>
+                  <span style="text-transform: capitalize;">{{ festDetails.fest_for || 'Everyone' }}</span>
+                </span>
+              </li>
+              <li>
+                <i class="feather icon-hash"></i>
+                <span class="val">
+                  <strong>Total Events</strong>
+                  {{ festDetails.event_count || 0 }} Competitions
+                </span>
+              </li>
+            </ul>
+          </div>
+
+        </div> <!-- sidebar -->
+
+      </div> <!-- content-grid -->
+    </div>
+
+  </div>
+</section>

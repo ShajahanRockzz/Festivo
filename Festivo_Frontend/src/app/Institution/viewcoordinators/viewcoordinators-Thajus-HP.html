@@ -1,0 +1,208 @@
+<div class="viewcoordinators-container fade-in-up">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="back-btn neon-btn" (click)="goBack()" title="Go Back">
+        <span class="back-icon">←</span>
+        <span>Back</span>
+      </button>
+      <div class="header-title">
+        <h1>Coordinators</h1>
+        <p>Manage all coordinators for your institution</p>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ coordinators.length }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active</span>
+          <span class="stat-value">{{ getActiveCount() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper grid-wrapper">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <div class="alert-content">
+        <span class="alert-icon">❌</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+        <button class="alert-close" (click)="errorMessage = ''" type="button">×</button>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <div class="alert-content">
+        <span class="alert-icon">✓</span>
+        <span class="alert-text">{{ successMessage }}</span>
+        <button class="alert-close" (click)="successMessage = ''" type="button">×</button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="controls-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search by name, email, or phone..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          class="search-input"
+        />
+      </div>
+
+      <div class="filter-box">
+        <label for="status-filter">Filter by Status:</label>
+        <select
+          id="status-filter"
+          [(ngModel)]="statusFilter"
+          (change)="onFilterChange()"
+          class="filter-select"
+        >
+          <option value="all">All Coordinators</option>
+          <option value="active">Active Only</option>
+          <option value="inactive">Inactive Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading coordinators...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredCoordinators.length === 0" class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h3>No coordinators found</h3>
+      <p *ngIf="coordinators.length === 0">No coordinators have been added yet. <a routerLink="/Institution/addcoordinator">Add one now</a></p>
+      <p *ngIf="coordinators.length > 0 && searchQuery">Try adjusting your search query</p>
+      <p *ngIf="coordinators.length > 0 && !searchQuery">Try adjusting your filters</p>
+    </div>
+
+    <!-- Coordinators Grid -->
+    <div *ngIf="!isLoading && filteredCoordinators.length > 0" class="coordinators-grid">
+      <div *ngFor="let coordinator of filteredCoordinators" class="coordinator-card bento-card">
+        <!-- Card Header with Image -->
+        <div class="card-header bento-card">
+          <div class="coordinator-image">
+            <img 
+              [src]="getCoordinatorImage(coordinator.image)" 
+              alt="{{ coordinator.name }}"
+              class="profile-img"
+              onerror="this.src='http://localhost:3000/uploads/default_user.avif'"
+            />
+          </div>
+          <span [class]="'status-badge ' + getStatusBadgeClass(coordinator.status)">
+            {{ coordinator.status | uppercase }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body bento-card">
+          <h3 class="coordinator-name">{{ coordinator.name }}</h3>
+          
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ coordinator.email }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Phone:</span>
+            <span class="info-value">{{ coordinator.contact_no }}</span>
+          </div>
+        </div>
+
+        <!-- Card Actions -->
+        <div class="card-actions bento-card">
+          <button
+            class="action-btn btn-edit neon-btn"
+            (click)="editCoordinator(coordinator.coordinator_id)"
+            title="Edit Coordinator"
+            [disabled]="isLoading"
+          >
+            <span class="btn-icon neon-btn">✎</span>
+            <span class="btn-label neon-btn">Edit</span>
+          </button>
+
+          <button
+            class="action-btn btn-status neon-btn"
+            (click)="toggleStatus(coordinator)"
+            [title]="coordinator.status === 'active' ? 'Deactivate' : 'Activate'"
+            [disabled]="isLoading"
+          >
+            <span class="btn-icon neon-btn">{{ coordinator.status === 'active' ? '⏸' : '▶' }}</span>
+            <span class="btn-label neon-btn">{{ coordinator.status === 'active' ? 'Deactivate' : 'Activate' }}</span>
+          </button>
+
+          <button
+            class="action-btn btn-delete neon-btn"
+            (click)="deleteCoordinator(coordinator)"
+            title="Delete Coordinator"
+            [disabled]="isLoading"
+          >
+            <span class="btn-icon neon-btn">🗑</span>
+            <span class="btn-label neon-btn">Delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showModal && modal.type === 'delete'" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header modal-delete">
+        <div class="modal-title">
+          <span class="modal-icon">⚠</span>
+          <span>Delete Coordinator</span>
+        </div>
+        <button type="button" class="modal-close" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete <strong>{{ modal.coordinatorName }}</strong>?</p>
+        <p class="warning-text">This action will also delete the coordinator's login account and cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary neon-btn" (click)="closeModal()" [disabled]="isLoading">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger neon-btn" (click)="confirmDelete()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Delete</span>
+          <span *ngIf="isLoading">Deleting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Change Confirmation Modal -->
+  <div *ngIf="showModal && modal.type === 'status'" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header modal-status">
+        <div class="modal-title">
+          <span class="modal-icon">{{ modal.newStatus === 'active' ? '✓' : '⏸' }}</span>
+          <span>{{ modal.newStatus === 'active' ? 'Activate' : 'Deactivate' }} Coordinator</span>
+        </div>
+        <button type="button" class="modal-close" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to <strong>{{ modal.newStatus }}</strong> <strong>{{ modal.coordinatorName }}</strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary neon-btn" (click)="closeModal()" [disabled]="isLoading">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary neon-btn" (click)="confirmStatusChange()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ modal.newStatus === 'active' ? 'Activate' : 'Deactivate' }}</span>
+          <span *ngIf="isLoading">Processing...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

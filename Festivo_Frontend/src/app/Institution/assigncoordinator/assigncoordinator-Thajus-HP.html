@@ -1,0 +1,119 @@
+<div class="assigncoordinator-container fade-in-up">
+	<div class="page-header">
+		<button class="back-btn neon-btn" (click)="goBack()">← Back</button>
+		<div class="header-text">
+			<h1>Assign Coordinators</h1>
+			<p>Link coordinators to competitions in a festival</p>
+		</div>
+	</div>
+
+	<div class="filters-row">
+		<div class="filters-card bento-card">
+			<label for="fest-select">Festival</label>
+			<select
+				id="fest-select"
+				[(ngModel)]="festId"
+				(change)="onFestChange()"
+			>
+				<option [ngValue]="null">Select a festival</option>
+				<option *ngFor="let fest of fests" [ngValue]="fest.fest_id">
+					{{ fest.fest_name }}
+				</option>
+			</select>
+		</div>
+		<div class="search-card bento-card">
+			<label for="competition-search">Search competitions</label>
+			<input
+				id="competition-search"
+				type="text"
+				[(ngModel)]="searchQuery"
+				(input)="onSearchChange()"
+				placeholder="Search by competition name or description"
+			/>
+		</div>
+	</div>
+
+	<div *ngIf="errorMessage" class="alert alert-error">
+		{{ errorMessage }}
+	</div>
+
+	<div *ngIf="successMessage" class="alert alert-success">
+		{{ successMessage }}
+	</div>
+
+	<div *ngIf="isLoading" class="loading-state">
+		<div class="spinner"></div>
+		<p>Loading assignments...</p>
+	</div>
+
+	<div *ngIf="!isLoading && festId && competitions.length === 0" class="empty-state">
+		<p>No competitions found for this festival.</p>
+	</div>
+
+	<div *ngIf="!isLoading && festId && competitions.length > 0 && filteredCompetitions.length === 0" class="empty-state">
+		<p>No competitions match your search.</p>
+	</div>
+
+	<div *ngIf="!isLoading && festId && filteredCompetitions.length > 0" class="competitions-grid">
+		<div *ngFor="let comp of filteredCompetitions" class="competition-card bento-card">
+			<div class="card-header bento-card">
+				<div class="title-group">
+					<h3>{{ comp.comp_name }}</h3>
+					<span class="assignment-count">{{ getAssignedCount(comp.comp_id) }} assigned</span>
+				</div>
+			</div>
+
+			<p class="card-description bento-card">{{ comp.description }}</p>
+
+			<div class="assign-row">
+				<div class="assign-field">
+					<label>Coordinator</label>
+					<select [(ngModel)]="selectedCoordinator[comp.comp_id]">
+						<option value="">Select coordinator</option>
+						<option *ngFor="let coord of coordinators" [value]="coord.coordinator_id">
+							{{ coord.name }} ({{ coord.email }})
+						</option>
+					</select>
+				</div>
+				<button
+					class="btn-assign neon-btn"
+					(click)="openAssignConfirm(comp.comp_id)"
+					[disabled]="isAssigning[comp.comp_id]"
+				>
+					{{ isAssigning[comp.comp_id] ? 'Assigning...' : 'Assign' }}
+				</button>
+			</div>
+
+			<div *ngIf="assignmentsByCompetition[comp.comp_id]?.length" class="assigned-list grid-wrapper">
+				<span class="assigned-label">Assigned</span>
+				<div class="assigned-chips">
+					<span
+						class="chip"
+						*ngFor="let item of assignmentsByCompetition[comp.comp_id]"
+					>
+						{{ item.coordinator_name }}
+						<button
+							class="chip-remove"
+							(click)="openRemoveConfirm(item.assgin_id, comp.comp_id, item.coordinator_name)"
+							[disabled]="isRemoving[item.assgin_id]"
+							title="Remove assignment"
+						>
+							{{ isRemoving[item.assgin_id] ? '...' : '×' }}
+						</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div *ngIf="showConfirmModal" class="modal-overlay" (click)="cancelAction()">
+		<div class="modal-card bento-card" (click)="$event.stopPropagation()">
+			<h3>{{ confirmTitle }}</h3>
+			<p>{{ confirmMessage }}</p>
+			<div class="modal-actions">
+				<button class="btn-cancel neon-btn" (click)="cancelAction()">Cancel</button>
+				<button class="btn-confirm neon-btn" (click)="confirmAction()">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>

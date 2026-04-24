@@ -1,0 +1,166 @@
+<div class="dashboard-container">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <h1>Welcome Back, {{ adminName }}! 👋</h1>
+      <p>Here's what's happening with your platform today</p>
+    </div>
+  </div>
+
+  <!-- Statistics Grid -->
+  <div class="stats-grid">
+    <!-- Total Institutions Card -->
+    <div class="stat-card institutions">
+      <div class="card-header">
+        <h3>Total Institutions</h3>
+        <div class="icon">🏫</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalInstitutions }}</div>
+        <div class="stat-label">Registered</div>
+      </div>
+    </div>
+
+    <!-- Total Participants Card -->
+    <div class="stat-card participants">
+      <div class="card-header">
+        <h3>Total Participants</h3>
+        <div class="icon">👤</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalParticipants }}</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+    </div>
+
+    <!-- Total Coordinators Card -->
+    <div class="stat-card coordinators">
+      <div class="card-header">
+        <h3>Total Coordinators</h3>
+        <div class="icon">📋</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalCoordinators }}</div>
+        <div class="stat-label">Assigned</div>
+      </div>
+    </div>
+
+    <!-- Total Festivals Card -->
+    <div class="stat-card festivals">
+      <div class="card-header">
+        <h3>Total Festivals</h3>
+        <div class="icon">🎉</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalFestivals }}</div>
+        <div class="stat-label">Created</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Second Row Statistics -->
+  <div class="stats-grid">
+    <!-- Total Competitions Card -->
+    <div class="stat-card competitions">
+      <div class="card-header">
+        <h3>Total Competitions</h3>
+        <div class="icon">🏆</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalCompetitions }}</div>
+        <div class="stat-label">Organized</div>
+      </div>
+    </div>
+
+    <!-- Active Festivals Card -->
+    <div class="stat-card active">
+      <div class="card-header">
+        <h3>Active Festivals</h3>
+        <div class="icon">✨</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.activeFestivals }}</div>
+        <div class="stat-label">Running</div>
+      </div>
+    </div>
+
+    <!-- Total Payments Card -->
+    <div class="stat-card payments">
+      <div class="card-header">
+        <h3>Total Payments</h3>
+        <div class="icon">💳</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">{{ stats.totalPayments }}</div>
+        <div class="stat-label">Transactions</div>
+      </div>
+    </div>
+
+    <!-- Total Revenue Card -->
+    <div class="stat-card revenue">
+      <div class="card-header">
+        <h3>Total Revenue</h3>
+        <div class="icon">💰</div>
+      </div>
+      <div class="card-body">
+        <div class="stat-number">₹{{ stats.totalRevenue | number }}</div>
+        <div class="stat-label">Collected</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="quick-actions-section">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <button class="action-btn institutions-btn">
+        <span class="btn-icon">🏫</span>
+        <span class="btn-text">Manage Institutions</span>
+      </button>
+      <button class="action-btn participants-btn">
+        <span class="btn-icon">👥</span>
+        <span class="btn-text">Manage Participants</span>
+      </button>
+      <button class="action-btn festivals-btn">
+        <span class="btn-icon">🎉</span>
+        <span class="btn-text">Manage Festivals</span>
+      </button>
+      <button class="action-btn competitions-btn">
+        <span class="btn-icon">🏆</span>
+        <span class="btn-text">Manage Competitions</span>
+      </button>
+      <button class="action-btn coordinators-btn">
+        <span class="btn-icon">📋</span>
+        <span class="btn-text">Manage Coordinators</span>
+      </button>
+      <button class="action-btn reports-btn">
+        <span class="btn-icon">📊</span>
+        <span class="btn-text">View Reports</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Information Grid -->
+  <div class="info-section">
+    <div class="info-card">
+      <h3>📌 Platform Status</h3>
+      <ul class="info-list">
+        <li><span class="label">Active Users:</span> <span class="value">{{ stats.totalParticipants + stats.totalCoordinators + stats.totalInstitutions }}</span></li>
+        <li><span class="label">Total Events:</span> <span class="value">{{ stats.totalFestivals }}</span></li>
+        <li><span class="label">Active Events:</span> <span class="value">{{ stats.activeFestivals }}</span></li>
+        <li><span class="label">Total Revenue:</span> <span class="value">₹{{ stats.totalRevenue | number }}</span></li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <h3>🎯 System Overview</h3>
+      <ul class="info-list">
+        <li><span class="label">Total Institutions:</span> <span class="value">{{ stats.totalInstitutions }}</span></li>
+        <li><span class="label">Total Competitions:</span> <span class="value">{{ stats.totalCompetitions }}</span></li>
+        <li><span class="label">Total Coordinators:</span> <span class="value">{{ stats.totalCoordinators }}</span></li>
+        <li><span class="label">Payment Transactions:</span> <span class="value">{{ stats.totalPayments }}</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div>

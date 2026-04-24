@@ -1,0 +1,1 @@
+const fs = require('fs'); const pf = 'Festivo_Frontend/src/app/Guest/registerinstitution/registerinstitution.ts'; let ts = fs.readFileSync(pf, 'utf8'); ts = ts.replace('this.submitting = true;', 'this.submitting = true;\n      window.scrollTo({ top: 0, behavior: \'smooth\' });'); fs.writeFileSync(pf, ts); console.log('Added scroll to top');

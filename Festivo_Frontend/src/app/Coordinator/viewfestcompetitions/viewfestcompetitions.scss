@@ -1,0 +1,404 @@
+.competitions-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Back Button
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+  border: 2px solid #1e88e5;
+  color: #1e88e5;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+
+  .arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background: #1e88e5;
+    color: white;
+    transform: translateX(-4px);
+
+    .arrow {
+      transform: translateX(-4px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Loading Spinner
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f5f5f5;
+    border-top: 5px solid #1e88e5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    margin-top: 1rem;
+    color: #718096;
+font-size: 1rem;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Fest Header
+.fest-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  background: #ffffff;
+border-radius: 20px;
+  overflow: hidden;
+  /* shadow removed */
+
+  .fest-header-image {
+    width: 250px;
+    height: 200px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #f5f5f5;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .fest-header-content {
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1565c0;
+      margin: 0 0 1rem 0;
+    }
+
+    .fest-dates {
+      font-size: 1rem;
+      color: #718096;
+margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  background: #ffffff;
+border-radius: 20px;
+  padding: 3rem;
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    color: #1a2332;
+margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: #718096;
+margin: 0;
+  }
+}
+
+// Competitions List
+.competitions-list {
+  h2 {
+    font-size: 1.5rem;
+    color: #1565c0;
+    margin: 0 0 1.5rem 0;
+    font-weight: 700;
+  }
+}
+
+// Competitions Grid
+.competitions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+// Competition Card
+.competition-card {
+  background: #ffffff;
+border-radius: 20px;
+  overflow: hidden;
+  /* shadow removed */
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    /* shadow removed */
+    transform: translateY(-4px);
+  }
+
+  .comp-image {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+
+    &.placeholder {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    }
+  }
+
+  .comp-details {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .comp-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1565c0;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .comp-status {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      color: white;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      width: fit-content;
+      letter-spacing: 0.5px;
+    }
+
+    .comp-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .meta-label {
+          font-size: 0.75rem;
+          color: #718096;
+text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 600;
+        }
+
+        .meta-value {
+          font-size: 0.95rem;
+          color: #1a2332;
+font-weight: 600;
+        }
+      }
+    }
+
+    .comp-requirements {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      .req-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        background: #f3e5f5;
+        color: #7b1fa2;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+    }
+
+    .comp-description {
+      color: #718096;
+font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 0 0 1.5rem 0;
+      flex: 1;
+    }
+
+    .comp-actions {
+      display: flex;
+      gap: 0.75rem;
+
+      button {
+        flex: 1;
+        padding: 0.65rem 1rem;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &.btn-primary {
+          background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+          color: white;
+
+          &:hover {
+            background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+            /* shadow removed */
+          }
+        }
+
+        &.btn-secondary {
+          background: #f5f5f5;
+          color: #1e88e5;
+          border: 1px solid #e2e8f0;
+
+          &:hover {
+            background: #e3f2fd;
+            border-color: #1e88e5;
+          }
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .competitions-container {
+    padding: 1.5rem;
+  }
+
+  .fest-header {
+    flex-direction: column;
+    margin-bottom: 2rem;
+
+    .fest-header-image {
+      width: 100%;
+      height: 250px;
+    }
+
+    .fest-header-content {
+      padding: 1.5rem;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .competitions-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .competitions-container {
+    padding: 1rem;
+  }
+
+  .btn-back {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .fest-header {
+    .fest-header-content {
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  .competition-card {
+    .comp-details {
+      padding: 1rem;
+
+      .comp-actions {
+        flex-direction: column;
+      }
+    }
+  }
+}

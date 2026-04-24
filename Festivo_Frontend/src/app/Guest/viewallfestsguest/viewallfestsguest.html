@@ -1,0 +1,93 @@
+<!-- Main container for viewing all fests -->
+<section class="festivals-section" id="fests">
+  <div class="container relative-z">
+    
+    <div class="page-header">
+      <div>
+        <h1 class="premium-title">All Active Festivals</h1>
+        <p class="premium-subtitle">Discover and register for amazing campus events</p>
+      </div>
+      <div class="header-badge">
+        <span>{{ filteredFests.length }}</span>
+        <span class="badge-label">Showing</span>
+      </div>
+    </div>
+
+    <!-- Storage Dock for Filters -->
+    <div class="filters-container">
+      <div class="search-field">
+        <i class="feather icon-search search-icon"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Search festivals or institutions..." 
+        />
+      </div>
+
+      <div class="select-group festival-dock-filters">
+        <button *ngFor="let cat of categories"
+                class="filter-btn"
+                [class.active]="selectedCategory === cat"
+                (click)="selectedCategory = cat">
+          {{ cat }}
+          <div class="glow-indicator" *ngIf="selectedCategory === cat"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- No Festivals Message -->
+    <div class="empty-state glass-panel" *ngIf="filteredFests.length === 0">
+      <div class="icon-wrap"><i class="feather icon-search"></i></div>
+      <h3>No festivals found.</h3>
+      <p>Try adjusting your search or filters!</p>
+    </div>
+
+    <!-- Grid Architecture -->
+    <div class="festivals-grid" *ngIf="filteredFests.length > 0">
+      <div class="floating-card fest-card" *ngFor="let fest of filteredFests; let i = index" [style.--animation-order]="i">
+        
+        <div class="fest-image-wrapper">
+          <img [src]="getFestImage(fest.fest_image)" [alt]="fest.fest_name" class="fest-image" />
+          <div class="image-mask"></div>
+          <span class="fest-category"> {{ fest.category_name || 'General' }}</span>
+        </div>
+        
+        <div class="fest-info">
+          <h3 class="fest-title">{{ fest.fest_name }}</h3>
+          <p class="fest-description">{{ fest.fest_description }}</p>
+          
+          <div class="bento-details">
+            <div class="detail-item">
+              <span class="meta-label">DATES:</span>
+              <span class="meta-value">{{ fest.startdate | date: 'MMM dd' }} - {{ fest.enddate | date: 'MMM dd' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="fest.institution_name">
+              <span class="meta-label">INSTITUTION:</span>
+              <span class="meta-value">{{ fest.institution_name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="meta-label">EVENTS:</span>
+              <span class="meta-value">{{ fest.event_count || 0 }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="meta-label">AUDIENCE:</span>
+              <span class="meta-value" style="text-transform: capitalize;">{{ fest.fest_for || 'Everyone' }}</span>
+            </div>
+          </div>
+          
+          <button class="btn-ghost-glow" (click)="goToFestDetails(fest.fest_id)">View Details</button>
+        </div>
+      </div>
+      
+      <!-- Empty State Balance Card -->
+      <div class="floating-card coming-soon-card" *ngIf="filteredFests.length === 1" [style.--animation-order]="1">
+        <div class="coming-soon-content">
+          <div class="sparkle-icon">?</div>
+          <h3 class="coming-soon-title">More Fests Soon</h3>
+          <p>New universities and institutions are joining the platform every week. Stay tuned!</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

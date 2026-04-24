@@ -1,0 +1,168 @@
+<div class="edit-plan-container">
+  <!-- Message Modal/Popup -->
+  <div *ngIf="showMessageModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div *ngIf="errorMessage" class="modal-message error-modal">
+        <div class="modal-icon">✕</div>
+        <h2 class="modal-title">Error</h2>
+        <p class="modal-text">{{ errorMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+
+      <div *ngIf="successMessage" class="modal-message success-modal">
+        <div class="modal-icon">✓</div>
+        <h2 class="modal-title">Success</h2>
+        <p class="modal-text">{{ successMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading plan...</p>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div *ngIf="!isLoading" class="page-header">
+    <button class="back-btn" (click)="goBack()" title="Go back">← BACK</button>
+    <div class="header-content">
+      <h1>Edit Subscription Plan</h1>
+      <p class="subtitle">Update subscription plan details</p>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div *ngIf="!isLoading" class="form-wrapper">
+    <div class="form-card">
+      <!-- Form -->
+      <form (ngSubmit)="submitForm()" #planForm="ngForm">
+        <!-- Plan Name Field -->
+        <div class="form-group">
+          <label for="planName" class="form-label">Plan Name <span class="required">*</span></label>
+          <input
+            type="text"
+            id="planName"
+            class="form-input"
+            placeholder="e.g., Premium Plan"
+            [(ngModel)]="planData.plan_name"
+            name="plan_name"
+            required
+            minlength="3"
+            maxlength="100"
+          />
+          <small class="form-helper">Plan name should be 3-100 characters</small>
+        </div>
+
+        <!-- Duration Field -->
+        <div class="form-group">
+          <label for="days" class="form-label">Duration (Days) <span class="required">*</span></label>
+          <input
+            type="number"
+            id="days"
+            class="form-input"
+            placeholder="e.g., 30"
+            [(ngModel)]="planData.days"
+            name="days"
+            required
+            min="1"
+          />
+          <small class="form-helper">Subscription duration in days</small>
+        </div>
+
+        <!-- Amount Field -->
+        <div class="form-group">
+          <label for="amount" class="form-label">Amount (₹) <span class="required">*</span></label>
+          <input
+            type="text"
+            id="amount"
+            class="form-input"
+            placeholder="Enter amount"
+            [(ngModel)]="planData.amount"
+            name="amount"
+            required
+          />
+          <small class="form-helper">Enter the subscription amount in rupees</small>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-group">
+          <label for="description" class="form-label">Description <span class="required">*</span></label>
+          <textarea
+            id="description"
+            class="form-textarea"
+            placeholder="Enter detailed plan description"
+            [(ngModel)]="planData.description"
+            name="description"
+            required
+            minlength="10"
+            maxlength="500"
+            rows="4"
+          ></textarea>
+          <small class="form-helper">Description should be 10-500 characters</small>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="isSaving || !planForm.valid"
+          >
+            <span *ngIf="!isSaving">Update Plan</span>
+            <span *ngIf="isSaving">Updating...</span>
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="goBack()"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <!-- Plan Information -->
+      <div class="info-box">
+        <h3>Plan Information</h3>
+        <ul class="info-list">
+          <li>Update plan details to reflect accurate information</li>
+          <li>Amount should be in Indian Rupees (₹)</li>
+          <li>Duration represents how long the plan is valid</li>
+          <li>Changes will be visible to participants immediately</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Plan Preview Card -->
+    <div class="preview-card">
+      <h3>Plan Preview</h3>
+      
+      <!-- Plan Name -->
+      <div class="plan-name-preview" *ngIf="planData.plan_name">
+        {{ planData.plan_name }}
+      </div>
+      <div class="plan-name-preview empty" *ngIf="!planData.plan_name">
+        Plan Name
+      </div>
+
+      <!-- Plan Price -->
+      <div class="plan-price">
+        <span *ngIf="planData.amount">₹{{ planData.amount }}</span>
+        <span *ngIf="!planData.amount">₹0</span>
+        <span class="price-duration" *ngIf="planData.days">/{{ planData.days }} days</span>
+      </div>
+
+      <!-- Plan Description -->
+      <p class="plan-description" *ngIf="planData.description">
+        {{ planData.description }}
+      </p>
+      <p class="plan-description empty" *ngIf="!planData.description">
+        Plan description will appear here
+      </p>
+    </div>
+  </div>
+</div>

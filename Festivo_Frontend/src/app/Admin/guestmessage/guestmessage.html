@@ -1,0 +1,88 @@
+<div class="page-container">
+  <!-- Modal for delete confirmation -->
+  <div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="delete-modal">
+        <div class="modal-icon warning-icon">⚠️</div>
+        <h2 class="modal-title">Confirm Deletion</h2>
+        <p class="modal-message">Are you sure you want to delete this message? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="cancelDelete()">CANCEL</button>
+          <button class="btn-delete" (click)="confirmDeleteAction()">DELETE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Guest Messages</h1>
+      <p class="page-subtitle">Manage queries and messages submitted by guests.</p>
+    </div>
+    
+    <div class="filter-wrapper" *ngIf="!isLoading && !errorMessage">
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="filterStatus === 'all'" (click)="setFilter('all')">
+          All ({{ messages.length }})
+        </button>
+        <button class="filter-tab" [class.active]="filterStatus === 'unreaded'" (click)="setFilter('unreaded')">
+          Unread ({{ getUnreadCount() }})
+        </button>
+        <button class="filter-tab" [class.active]="filterStatus === 'readed'" (click)="setFilter('readed')">
+          Read ({{ getReadCount() }})
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading messages...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage && !isLoading">
+    {{ errorMessage }}
+  </div>
+
+  <div class="content-wrapper" *ngIf="!isLoading && !errorMessage">
+    <div class="empty-state" *ngIf="filteredMessages.length === 0">
+      <div class="empty-icon">📫</div>
+      <h3>No messages found</h3>
+      <p>There are no messages matching your current filter.</p>
+    </div>
+
+    <div class="messages-grid" *ngIf="filteredMessages.length > 0">
+      <div class="message-card" *ngFor="let msg of filteredMessages" [class.unread]="msg.status === 'unreaded'" [class.read]="msg.status === 'readed'">
+        <div class="message-header">
+          <div class="sender-info">
+            <div class="sender-avatar">{{ msg.name.charAt(0).toUpperCase() }}</div>
+            <div>
+              <h3 class="sender-name">{{ msg.name }}</h3>
+              <p class="sender-contact">
+                <a href="mailto:{{ msg.email }}">{{ msg.email }}</a> | 
+                <a href="tel:{{ msg.phone_no }}">{{ msg.phone_no }}</a>
+              </p>
+            </div>
+          </div>
+          <div class="status-badge" [class.status-unread]="msg.status === 'unreaded'" [class.status-read]="msg.status === 'readed'">
+            {{ msg.status === 'unreaded' ? 'Unread' : 'Read' }}
+          </div>
+        </div>
+
+        <div class="message-body">
+          <h4 class="message-subject">{{ msg.subject }}</h4>
+          <p class="message-text">{{ msg.message }}</p>
+        </div>
+
+        <div class="message-actions">
+          <button class="btn btn-secondary" *ngIf="msg.status === 'unreaded'" (click)="markAsRead(msg.contact_id)">
+            Mark as Read
+          </button>
+          <button class="btn btn-danger" (click)="deleteMessage(msg.contact_id)">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

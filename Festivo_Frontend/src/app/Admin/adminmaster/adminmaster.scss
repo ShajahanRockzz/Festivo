@@ -1,0 +1,340 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+// Color Variables
+$primary-blue: #0052a3;
+$secondary-blue: #2979f0;
+$tertiary-blue: #4a90e2;
+$light-blue: #e3f2fd;
+$dark-color: #1a2332;
+$light-color: #f8f9fa;
+$white: #ffffff;
+$text-color: #4a5568;
+$text-light: #718096;
+$border-color: #e2e8f0;
+$error-color: #ef4444;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: $light-color;
+  color: $text-color;
+}
+
+// Header Styles
+.admin-header {
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  color: $white;
+  padding: 1rem 2rem;
+  /* shadow removed */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-container {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      padding: 0;
+    }
+  }
+
+  .header-left {
+    flex-shrink: 0;
+
+    .logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .header-right {
+    flex-shrink: 0;
+
+    .user-menu-container {
+      position: relative;
+
+      .user-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1.2rem;
+        background-color: rgba(255, 255, 255, 0.15);
+        color: $white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.25);
+          border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .user-icon {
+          font-size: 1.2rem;
+        }
+
+        .dropdown-icon {
+          font-size: 0.7rem;
+          margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.85rem;
+
+          .user-name {
+            display: none;
+          }
+        }
+      }
+
+      .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: $white;
+        border-radius: 0.75rem;
+        /* shadow removed */
+        min-width: 220px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+        animation: slideDown 0.2s ease;
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          color: $text-color;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.95rem;
+
+          &:hover {
+            background-color: $light-blue;
+            color: $primary-blue;
+          }
+
+          .item-icon {
+            font-size: 1.1rem;
+          }
+
+          &.logout:hover {
+            background-color: #fee2e2;
+            color: $error-color;
+          }
+        }
+
+        .dropdown-divider {
+          height: 1px;
+          background-color: $border-color;
+          margin: 0.5rem 0;
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Admin Wrapper
+.admin-wrapper {
+  display: flex;
+  min-height: calc(100vh - 200px);
+}
+
+// Sidebar Styles
+.admin-sidebar {
+  width: 280px;
+  background: $white;
+  border-right: 1px solid $border-color;
+  overflow-y: auto;
+  /* shadow removed */
+
+  @media (max-width: 768px) {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    height: calc(100vh - 60px);
+    width: 250px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 50;
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-nav {
+    padding: 1rem 0;
+
+    .menu-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      .menu-item {
+        margin: 0;
+
+        .menu-button {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.875rem 1.25rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 0.95rem;
+          color: $text-color;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          text-align: left;
+
+          &:hover {
+            background-color: $light-blue;
+            color: $primary-blue;
+          }
+
+          &.expanded {
+            background-color: $light-blue;
+            color: $primary-blue;
+
+            .menu-arrow {
+              transform: rotate(90deg);
+            }
+          }
+
+          .menu-icon {
+            font-size: 1.3rem;
+            min-width: 24px;
+          }
+
+          .menu-label {
+            flex: 1;
+          }
+
+          .menu-arrow {
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+            color: $text-light;
+          }
+        }
+
+        .submenu {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          background-color: rgba(0, 82, 163, 0.02);
+          border-top: 1px solid $border-color;
+          border-bottom: 1px solid $border-color;
+          animation: slideDown 0.2s ease;
+
+          .submenu-item {
+            margin: 0;
+
+            .submenu-link {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              padding: 0.75rem 1.25rem 0.75rem 3rem;
+              color: $text-color;
+              text-decoration: none;
+              font-size: 0.9rem;
+              transition: all 0.2s ease;
+
+              &:hover {
+                background-color: $light-blue;
+                color: $primary-blue;
+                padding-left: 3.25rem;
+              }
+
+              .submenu-icon {
+                font-size: 1rem;
+              }
+
+              .submenu-label {
+                flex: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Main Content Area
+.admin-content {
+  flex: 1;
+  background-color: $light-color;
+  padding: 2rem;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+// Footer Styles
+.admin-footer {
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  color: $white;
+  padding: 2rem;
+  text-align: center;
+
+  .footer-container {
+    max-width: 100%;
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+  }
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $light-color;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: 20px;
+
+  &:hover {
+    background: $text-light;
+  }
+}
+

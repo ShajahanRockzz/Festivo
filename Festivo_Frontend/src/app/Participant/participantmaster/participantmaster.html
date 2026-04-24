@@ -1,0 +1,82 @@
+<!-- Header/Navigation -->
+<header class="participant-header">
+	<div class="navbar">
+		<div class="navbar-container fade-in-up">
+			<div class="navbar-logo">
+				<h1>🎉 Festivo</h1>
+			</div>
+			<nav class="navbar-menu">
+				<ul class="nav-list grid-wrapper">
+                                        <li><a routerLink="/participantmaster/participanthome" class="nav-link">Home</a></li>
+                                        <li><a routerLink="/participantmaster/viewallfests" class="nav-link">Fests</a></li>
+                                        <li><a routerLink="/participantmaster/about" class="nav-link">About Us</a></li>
+                                        <li><a routerLink="/participantmaster/contact" class="nav-link">Contact</a></li>
+                                </ul>
+			</nav>
+			<div class="user-menu" [class.open]="isMenuOpen">
+				<button class="user-trigger" type="button" (click)="toggleMenu()" aria-label="User menu">
+					<span class="user-avatar">👤</span>
+					<span class="user-name">{{ participantName }}</span>
+					<span class="chevron">▾</span>
+				</button>
+				<div class="dropdown" *ngIf="isMenuOpen">
+                                        <a routerLink="/participantmaster/myregistrations" class="dropdown-item" (click)="isMenuOpen = false">
+                                                 My registrations
+                                        </a>
+                                        <a routerLink="/participantmaster/mycompetitions" class="dropdown-item" (click)="isMenuOpen = false">
+                                                My competitions
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="button" class="dropdown-item logout-btn neon-btn" (click)="logout()">
+                                                <i class="fa-solid fa-arrow-right-from-bracket icon"></i> Logout
+                                        </button>
+                                </div>
+			</div>
+		</div>
+	</div>
+</header>
+
+<!-- Main Content -->
+<main class="participant-content">
+	<router-outlet></router-outlet>
+</main>
+
+<!-- Footer -->
+<footer class="participant-footer">
+	<div class="footer-container fade-in-up">
+		<div class="footer-content">
+			<div class="footer-section">
+				<h3>Festivo</h3>
+				<p>Your ultimate fest management platform for seamless event coordination.</p>
+			</div>
+			<div class="footer-section">
+				<h4>Quick Links</h4>
+				<ul>
+					<li><a href="#home">Home</a></li>
+					<li><a href="#fests">Festivals</a></li>
+					<li><a href="#about">About Us</a></li>
+					<li><a href="#contact">Contact</a></li>
+				</ul>
+			</div>
+			<div class="footer-section">
+				<h4>Follow Us</h4>
+				<ul>
+					<li><a href="#">Facebook</a></li>
+					<li><a href="#">Twitter</a></li>
+					<li><a href="#">Instagram</a></li>
+				</ul>
+			</div>
+			<div class="footer-section">
+				<h4>Contact Info</h4>
+				<p>Email: info@festivo.com</p>
+				<p>Phone: +91-XXXX-XXXX</p>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2026 Festivo. All Rights Reserved.</p>
+		</div>
+	</div>
+</footer>
+
+
+

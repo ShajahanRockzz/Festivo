@@ -1,0 +1,268 @@
+<div class="festdetails-container">
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div [ngClass]="'modal-message ' + (modalData.type === 'error' ? 'error-modal' : 'success-modal')">
+        <div class="modal-icon">{{ modalData.type === 'error' ? '❌' : '✓' }}</div>
+        <h2 class="modal-title">{{ modalData.title }}</h2>
+        <p class="modal-text">{{ modalData.message }}</p>
+        <div class="modal-actions">
+          <button class="modal-btn" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Competition Confirmation Modal -->
+  <div *ngIf="showDeleteConfirmModal" class="modal-overlay" (click)="cancelDeleteCompetition()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-message confirm-modal">
+        <div class="modal-icon">⚠️</div>
+        <h2 class="modal-title">Delete Competition</h2>
+        <p class="modal-text">Are you sure you want to delete the competition <strong>"{{ competitionToDelete?.name }}"</strong>? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="modal-btn btn-cancel" (click)="cancelDeleteCompetition()">Cancel</button>
+          <button class="modal-btn btn-delete" (click)="confirmDeleteCompetition()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Competition Modal -->
+  <div *ngIf="showAddCompetitionModal" class="modal-overlay" (click)="closeAddCompetitionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">Add Competition</h2>
+      <div class="form-group">
+        <label>Competition Name</label>
+        <input type="text" [(ngModel)]="newCompetition.comp_name" placeholder="Enter competition name" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="newCompetition.description" placeholder="Enter competition description" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Max Members</label>
+        <input type="number" [(ngModel)]="newCompetition.max_members" placeholder="Enter maximum number of members" min="1" />
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" (click)="closeAddCompetitionModal()">Cancel</button>
+        <button class="modal-btn btn-submit" (click)="addCompetition()">Add Competition</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Coordinator Modal -->
+  <div *ngIf="showAddCoordinatorModal" class="modal-overlay" (click)="closeAddCoordinatorModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">Add Coordinator</h2>
+      <div class="form-group">
+        <label>Coordinator Name</label>
+        <input type="text" [(ngModel)]="newCoordinator.coord_name" placeholder="Enter coordinator name" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="newCoordinator.coord_email" placeholder="Enter email address" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" [(ngModel)]="newCoordinator.coord_phone" placeholder="Enter 10-digit phone number" maxlength="10" />
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" (click)="closeAddCoordinatorModal()">Cancel</button>
+        <button class="modal-btn btn-submit" (click)="addCoordinator()">Add Coordinator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Status Modal -->
+  <div *ngIf="showResultModal" class="modal-overlay" (click)="closeResultModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">Update Result Status</h2>
+      <div class="form-group">
+        <label>Select Result Status</label>
+        <select [(ngModel)]="selectedResultStatus" class="status-select">
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" (click)="closeResultModal()">Cancel</button>
+        <button class="modal-btn btn-submit" (click)="updateResultStatus()">Update Status</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publish Result Confirmation Modal -->
+  <div *ngIf="showPublishResultModal" class="modal-overlay" (click)="closePublishResultModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">Publish Result</h2>
+      <p class="modal-text">Are you sure you want to publish the results? This will notify all registered participants.</p>
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" (click)="closePublishResultModal()">Cancel</button>
+        <button class="modal-btn btn-submit" (click)="publishResult()">Publish Result</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading fest details...</p>
+  </div>
+
+  <!-- Fest Details -->
+  <div *ngIf="!isLoading && fest" class="details-container">
+    <!-- Header with Back Button -->
+    <div class="details-header">
+      <button class="btn-back" (click)="goBack()">← Back to Festivals</button>
+      <h1 class="fest-title">{{ fest.fest_name }}</h1>
+    </div>
+
+    <!-- Fest Overview Section -->
+    <section class="section fest-overview">
+      <div class="overview-grid">
+        <!-- Fest Image -->
+        <div class="fest-image-container">
+          <img *ngIf="fest.fest_image" [src]="getImageUrl(fest.fest_image)" [alt]="fest.fest_name" class="fest-image" (error)="onImageError($event)" />
+          <img *ngIf="!fest.fest_image" src="/uploads/default_fest.jpg" [alt]="fest.fest_name" class="fest-image" (error)="onImageError($event)" />
+        </div>
+
+        <!-- Fest Info -->
+        <div class="fest-info">
+          <div class="info-row">
+            <label>📝 Description</label>
+            <p [ngClass]="{'text-muted': !fest.fest_description}">{{ fest.fest_description || 'No description provided.' }}</p>
+          </div>
+          <div class="info-row">
+            <label>📅 Dates</label>
+            <p>{{ formatDate(fest.startdate) }} - {{ formatDate(fest.enddate) }}</p>
+          </div>
+          <div class="info-row">
+            <label>👥 For</label>
+            <p [ngClass]="{'text-muted': !fest.fest_for}" style="text-transform: capitalize;">{{ fest.fest_for || 'Not specified' }}</p>
+          </div>
+          <div class="info-row">
+            <label>Status</label>
+            <span class="status-badge" [ngClass]="fest.status === 'active' ? 'badge-active' : 'badge-inactive'">
+              {{ fest.status === 'active' ? 'Published' : 'Draft' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <!-- Competitions Section -->
+    <section class="section competitions-section">
+      <div class="section-header">
+        <h2>Competitions</h2>
+        <p class="section-subtitle">{{ competitions.length }} competition(s) in this festival</p>
+      </div>
+
+      <div class="add-competition-btn-container">
+        <button class="btn-add-competition" [routerLink]="'/Institution/createcompetition'" [queryParams]="{ festId: fest?.fest_id }">
+          <span class="icon">➕</span>
+          Add Competition
+        </button>
+      </div>
+
+      <div *ngIf="competitions.length === 0" class="empty-state">
+        <p>No competitions added yet</p>
+      </div>
+
+      <div *ngIf="competitions.length > 0" class="competitions-grid">
+        <div *ngFor="let comp of competitions.slice(0, 3)" class="competition-card">
+          <div class="comp-image-container">
+            <img 
+              [src]="getImageUrl(comp?.image || '')"
+              [alt]="comp?.comp_name"
+              class="comp-image"
+              (error)="onImageError($event)"
+            />
+          </div>
+          <div class="comp-header">
+            <h3 class="comp-name">{{ comp.comp_name }}</h3>
+            <div class="comp-actions">
+              <button 
+                class="btn-edit" 
+                [routerLink]="'/Institution/editcompetition'" 
+                [queryParams]="{ compId: comp.comp_id, festId: fest.fest_id }" 
+                title="Edit competition"
+              >
+                ✏️
+              </button>
+              <button 
+                class="btn-delete" 
+                (click)="deleteCompetition(comp.comp_id, comp.comp_name)" 
+                title="Delete competition"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+          <p class="comp-description">{{ comp.description }}</p>
+          <div class="comp-meta">
+            <div class="meta-item">
+              <span class="meta-label">Registrations</span>
+              <span class="meta-value">{{ comp.reg_count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="competitions.length > 3" class="view-all-container view-all-wrapper">
+        <button class="btn-view-all" (click)="viewAllCompetitions()" >
+          View All Competitions
+        </button>
+      </div>
+    </section>
+
+    <!-- Coordinators Section -->
+    <section class="section coordinators-section">
+      <div class="section-header">
+        <h2>Coordinators</h2>
+        <p class="section-subtitle">{{ coordinators.length }} coordinator(s) assigned</p>
+      </div>
+
+      <div class="coordinator-actions">
+        <button class="btn-view-coordinators" [routerLink]="'/Institution/viewcoordinators'">
+          View All Coordinators
+        </button>
+        <button
+          class="btn-add-coordinator"
+          [routerLink]="'/Institution/assigncoordinator'"
+          [queryParams]="{ festId: fest.fest_id }"
+        >
+          <span class="icon">➕</span>
+          Assign Coordinator
+        </button>
+      </div>
+
+      <div *ngIf="coordinators.length === 0" class="empty-state">
+        <p>No coordinators assigned yet. Add one to get started.</p>
+      </div>
+
+      <div *ngIf="coordinators.length > 0" class="coordinators-grid">
+        <div *ngFor="let coord of coordinators" class="coordinator-card">
+          <div class="coord-header">
+            <h3 class="coord-name">{{ coord.coord_name }}</h3>
+            <button class="btn-delete" (click)="deleteCoordinator(coord.coord_id)" title="Remove coordinator">🗑️</button>
+          </div>
+          <div class="coord-details">
+            <div class="detail-row">
+              <span class="detail-label">📧 Email</span>
+              <span class="detail-value">{{ coord.coord_email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">📱 Phone</span>
+              <span class="detail-value">{{ coord.coord_phone }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+

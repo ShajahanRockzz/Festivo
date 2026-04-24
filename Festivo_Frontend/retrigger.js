@@ -1,0 +1,1 @@
+const fs = require('fs'); const file = 'src/app/Guest/festdetailsguest/festdetailsguest.ts'; let content = fs.readFileSync(file, 'utf8'); content = content.replace(/this\.isLoading = false;/g, 'this.isLoading = false; console.log(''setting isLoading to false'', this.festDetails);'); fs.writeFileSync(file, content);

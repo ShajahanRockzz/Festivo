@@ -1,0 +1,120 @@
+<div class="coordinatorhome-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div *ngIf="!isLoading" class="page-header">
+    <div class="header-content">
+      <h1>Welcome, {{ coordinatorName }}! 👋</h1>
+      <p class="subtitle">Here's an overview of your assigned events and tasks</p>
+    </div>
+    <button class="view-events-btn">
+      <span>👁️</span> View All Events
+    </button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div *ngIf="!isLoading" class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon event-icon">🎉</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Assigned Events</h3>
+        <p class="stat-value">{{ stats.assignedEvents }}</p>
+        <p class="stat-detail">Events under coordination</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon task-icon">✓</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Completed Tasks</h3>
+        <p class="stat-value">{{ stats.completedTasks }}</p>
+        <p class="stat-detail">Successfully completed</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending-icon">⏳</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Pending Tasks</h3>
+        <p class="stat-value">{{ stats.pendingTasks }}</p>
+        <p class="stat-detail">Awaiting completion</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon attendee-icon">👥</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Total Attendees</h3>
+        <p class="stat-value">{{ stats.totalAttendees }}</p>
+        <p class="stat-detail">Across your events</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div *ngIf="!isLoading" class="content-grid">
+    <!-- Recent Events Section -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>🎉 Recent Events</h2>
+        <a href="#viewall" class="view-all-link">View All →</a>
+      </div>
+
+      <div class="event-cards">
+        <div *ngFor="let event of recentEvents" class="event-card">
+          <div class="event-badge" [class.active]="event.status === 'active'"
+            [class.inactive]="event.status !== 'active'">
+            {{ event.status | uppercase }}
+          </div>
+          <h3 class="event-name">{{ event.name }}</h3>
+          <p class="event-date">
+            <span class="calendar-icon">📅</span>
+            {{ event.date | date: 'MMM dd, yyyy' }}
+          </p>
+          <button class="event-action-btn">View Details</button>
+        </div>
+
+        <div *ngIf="recentEvents.length === 0" class="no-data-message">
+          <p>No events assigned yet. Check back soon! 📋</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming Tasks Section -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>⏳ Upcoming Tasks</h2>
+        <a href="#viewall" class="view-all-link">View All →</a>
+      </div>
+
+      <div class="task-list">
+        <div *ngFor="let task of upcomingTasks" class="task-item">
+          <div class="task-header">
+            <h3 class="task-title">{{ task.title }}</h3>
+            <span class="task-priority" [class.high]="task.priority === 'high'"
+              [class.medium]="task.priority === 'medium'" [class.low]="task.priority === 'low'">
+              {{ task.priority | uppercase }}
+            </span>
+          </div>
+          <p class="task-event">
+            <span class="icon">🎭</span> Event: {{ task.event }}
+          </p>
+          <p class="task-due-date">
+            <span class="icon">📅</span> Due: {{ task.dueDate | date: 'MMM dd, yyyy' }}
+          </p>
+          <button class="task-action-btn">Mark Complete</button>
+        </div>
+
+        <div *ngIf="upcomingTasks.length === 0" class="no-data-message">
+          <p>No pending tasks! Great job! 🎉</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

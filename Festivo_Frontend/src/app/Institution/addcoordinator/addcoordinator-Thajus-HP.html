@@ -1,0 +1,229 @@
+<div class="addcoordinator-container fade-in-up">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="back-btn neon-btn" (click)="goBack()" title="Go Back">
+        <span class="back-icon">←</span>
+        <span>Back</span>
+      </button>
+      <div class="header-title">
+        <h1>Add New Coordinator</h1>
+        <p>Fill in the details below to add a new coordinator to your institution</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="form-wrapper grid-wrapper">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <div class="alert-content">
+        <span class="alert-icon">❌</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+        <button class="alert-close" (click)="errorMessage = ''" type="button">×</button>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="addCoordinator()" class="coordinator-form" novalidate>
+      <div class="form-card bento-card">
+        <!-- Profile Image Section -->
+        <div class="form-section image-section">
+          <h3 class="section-title">Profile Image</h3>
+          
+          <div class="image-upload-area">
+            <div *ngIf="selectedImagePreview" class="image-preview">
+              <img [src]="selectedImagePreview" alt="Coordinator preview" class="preview-img">
+              <button type="button" class="remove-image-btn neon-btn" (click)="removeImage()" title="Remove image">
+                <span>✕</span>
+              </button>
+            </div>
+
+            <div *ngIf="!selectedImagePreview" class="upload-placeholder">
+              <label for="imageInput" class="upload-label">
+                <div class="upload-icon">📸</div>
+                <p class="upload-text">Click to upload profile image</p>
+                <p class="upload-hint">or drag and drop (JPG, PNG, GIF, WebP - Max 5MB)</p>
+              </label>
+            </div>
+
+            <input
+              #fileInput
+              type="file"
+              id="imageInput"
+              class="file-input"
+              accept="image/*"
+              (change)="onImageSelected($event)"
+              hidden
+            />
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Information</h3>
+
+          <div class="form-row">
+            <div class="form-group" [class.has-error]="validationErrors.name">
+              <label for="name" class="form-label">Full Name *</label>
+              <div class="input-wrapper grid-wrapper" [class.error-border]="validationErrors.name && formTouched.name">
+                <span class="input-icon">👤</span>
+                <input
+                  type="text"
+                  id="name"
+                  [(ngModel)]="coordinator.name"
+                  name="name"
+                  placeholder="Enter coordinator's full name"
+                  class="form-control"
+                  (blur)="validateName()"
+                  (input)="validateName()"
+                  required
+                />
+              </div>
+              <div *ngIf="validationErrors.name && formTouched.name" class="error-message">
+                {{ validationErrors.name }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" [class.has-error]="validationErrors.email">
+              <label for="email" class="form-label">Email Address *</label>
+              <div class="input-wrapper grid-wrapper" [class.error-border]="validationErrors.email && formTouched.email">
+                <span class="input-icon">📧</span>
+                <input
+                  type="email"
+                  id="email"
+                  [(ngModel)]="coordinator.email"
+                  name="email"
+                  placeholder="Enter email address"
+                  class="form-control"
+                  (blur)="validateEmail()"
+                  (input)="validateEmail()"
+                  required
+                />
+              </div>
+              <div *ngIf="validationErrors.email && formTouched.email" class="error-message">
+                {{ validationErrors.email }}
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="validationErrors.contact_no">
+              <label for="contact_no" class="form-label">Contact Number *</label>
+              <div class="input-wrapper grid-wrapper" [class.error-border]="validationErrors.contact_no && formTouched.contact_no">
+                <span class="input-icon">📱</span>
+                <input
+                  type="tel"
+                  id="contact_no"
+                  [(ngModel)]="coordinator.contact_no"
+                  name="contact_no"
+                  placeholder="Enter 10-digit phone number"
+                  class="form-control"
+                  (input)="onPhoneInput($event)"
+                  (blur)="validatePhone()"
+                  inputmode="numeric"
+                  maxlength="10"
+                  required
+                />
+              </div>
+              <div *ngIf="validationErrors.contact_no && formTouched.contact_no" class="error-message">
+                {{ validationErrors.contact_no }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Login Credentials Section -->
+        <div class="form-section">
+          <h3 class="section-title">Login Credentials</h3>
+
+          <div class="form-row">
+            <div class="form-group" [class.has-error]="validationErrors.username">
+              <label for="username" class="form-label">Username *</label>
+              <div class="input-wrapper grid-wrapper" [class.error-border]="validationErrors.username && formTouched.username">
+                <span class="input-icon">👤</span>
+                <input
+                  type="text"
+                  id="username"
+                  [(ngModel)]="coordinator.username"
+                  name="username"
+                  placeholder="Enter username (4+ chars, alphanumeric & underscore)"
+                  class="form-control"
+                  (blur)="validateUsername()"
+                  (input)="validateUsername()"
+                  required
+                />
+              </div>
+              <div *ngIf="validationErrors.username && formTouched.username" class="error-message">
+                {{ validationErrors.username }}
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="validationErrors.password">
+              <label for="password" class="form-label">Password *</label>
+              <div class="input-wrapper grid-wrapper" [class.error-border]="validationErrors.password && formTouched.password">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  id="password"
+                  [(ngModel)]="coordinator.password"
+                  name="password"
+                  placeholder="Enter password (6+ chars)"
+                  class="form-control"
+                  (blur)="validatePassword()"
+                  (input)="validatePassword()"
+                  required
+                />
+              </div>
+              <div *ngIf="validationErrors.password && formTouched.password" class="error-message">
+                {{ validationErrors.password }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary neon-btn"
+            [disabled]="isLoading"
+          >
+            <span *ngIf="!isLoading" class="btn-icon neon-btn">✓</span>
+            <span *ngIf="isLoading" class="btn-icon spinner neon-btn"></span>
+            <span class="btn-text neon-btn">{{ isLoading ? 'Adding...' : 'Add Coordinator' }}</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary neon-btn"
+            (click)="resetForm()"
+            [disabled]="isLoading"
+          >
+            <span class="btn-icon neon-btn">⟲</span>
+            <span class="btn-text neon-btn">Clear</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Success Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header" [class]="'modal-' + modalData.type">
+        <div class="modal-title">
+          <span class="modal-icon">✓</span>
+          <span>{{ modalData.title }}</span>
+        </div>
+        <button type="button" class="modal-close" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="success-icon">🎉</div>
+        <p class="success-message">{{ modalData.message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary neon-btn" (click)="closeModal()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>

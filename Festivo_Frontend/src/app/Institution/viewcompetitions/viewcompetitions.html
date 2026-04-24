@@ -1,0 +1,188 @@
+﻿<div class="view-competitions-container">
+  <div class="header-section">
+    <h1>Competitions for {{ festName }}</h1>
+    <button class="create-btn" (click)="router.navigate(['/Institution/createcompetition'], {queryParams: {festId: festId}})">
+      <i class="fas fa-plus"></i> Create Competition
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="no-data">
+    <i class="fas fa-spinner fa-spin"></i>
+    <h3>Loading competitions...</h3>
+  </div>
+
+  <div *ngIf="error && !loading" class="no-data" style="border-color: rgba(239, 68, 68, 0.3);">
+    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+    <h3>{{ error }}</h3>
+    <button (click)="goBack()" class="create-btn" style="margin: 16px auto 0;">Go Back</button>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Empty State -->
+    <div *ngIf="competitions.length === 0" class="no-data">
+      <i class="fas fa-folder-open"></i>
+      <h3>No Competitions Created</h3>
+      <p>There are no competitions created for this festival yet.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="competitions.length > 0">
+      <div class="filters-bar">
+        <div class="search-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()" placeholder="Search competitions..." />
+        </div>
+
+        <div class="filter-groups">
+          <div class="filter-group">
+            <select [(ngModel)]="filterType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option value="single">Single</option>
+              <option value="group">Group</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="competitions-grid" *ngIf="filteredCompetitions.length > 0; else noResults">
+        <div class="competition-card" *ngFor="let comp of filteredCompetitions"
+             [ngClass]="comp.res_status === 'published' ? 'card-published' : 'card-pending'">
+          
+          <div class="card-header">
+            <div class="header-content">
+              <h3>{{ comp.comp_name }}</h3>
+              <span class="category-badge" [ngClass]="comp.res_status === 'published' ? 'badge-published' : 'badge-pending'">
+                <i class="fas fa-trophy"></i> Results: {{ comp.res_status || 'Pending' | titlecase }}
+              </span>
+            </div>
+            <div class="action-top">
+               <button class="edit-btn header-btn" title="Edit" (click)="editCompetition(comp)">
+                 <i class="fas fa-edit"></i>
+               </button>
+               <button class="delete-btn header-btn" title="Delete" (click)="deleteCompetition(comp)">
+                 <i class="fas fa-trash-alt"></i>
+               </button>
+            </div>
+          </div>
+
+          <!-- Competition Image -->
+          <div class="comp-image-wrapper">
+            <img [src]="getCompetitionImagePath(comp)" [alt]="comp.comp_name" class="comp-image" onerror="this.style.display='none'" />
+          </div>
+
+          <div class="card-body">
+            <p *ngIf="comp.description" class="comp-description">{{ comp.description }}</p>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Type</span>
+                <span class="value"><i class="fas fa-user-friends"></i> {{ comp.type }}</span>
+              </div>
+              <div class="info-item" *ngIf="comp.competition_date">
+                <span class="label">Date</span>
+                <span class="value"><i class="far fa-calendar-alt"></i> {{ comp.competition_date | date: 'mediumDate' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Members</span>
+                <span class="value"><i class="fas fa-users"></i> {{ comp.min_members || 1 }} - {{ comp.max_members }}</span>
+              </div>
+              <div class="info-item" *ngIf="comp.grouplimit && comp.type === 'group'">
+                <span class="label">Groups Limit</span>
+                <span class="value"><i class="fas fa-users-slash"></i> {{ comp.grouplimit }}</span>
+              </div>
+              <div class="info-item" *ngIf="comp.reg_fee">
+                <span class="label">Reg Fee</span>
+                <span class="value"><i class="fas fa-rupee-sign"></i> {{ comp.reg_fee }}</span>
+              </div>
+            </div>
+
+            <!-- Detailed Actions -->
+            <div class="comp-detailed-actions">
+               <button class="action-badge details-btn" [routerLink]="['/Institution/competitionsdetails', comp.comp_id]" title="View Details">
+                 <i class="fas fa-info-circle"></i> Details
+               </button>
+               <button class="action-badge view-btn" (click)="viewParticipants(comp)">
+                 <i class="fas fa-users"></i> Participants
+               </button>
+               <button class="action-badge edit-result-btn" (click)="editResult(comp)">
+                 <i class="fas fa-clipboard-list"></i> Results
+               </button>
+               <button class="action-badge assign-btn" [routerLink]="'/Institution/assigncoordinator'" [queryParams]="{ festId: festId }">
+                 <i class="fas fa-user-tie"></i> Assign Coord.
+               </button>
+               <button class="action-badge publish-btn" 
+                  [ngClass]="comp.res_status === 'published' ? 'published' : ''"
+                  (click)="publishResults(comp)"
+                  [disabled]="publishingId === comp.comp_id">
+                 <i class="fas" [ngClass]="comp.res_status === 'published' ? 'fa-eye-slash' : 'fa-eye'"></i> 
+                 {{ publishingId === comp.comp_id ? 'Wait...' : (comp.res_status === 'published' ? 'Unpublish' : 'Publish') }}
+               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="no-data">
+          <i class="fas fa-search"></i>
+          <h3>No matches found</h3>
+          <p>Try adjusting your search or filters.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDeleteCompetition()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Delete Competition?</h3>
+      <p>Are you sure you want to delete <strong style="color: white;">{{ competitionToDelete?.comp_name }}</strong>? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="cancelDeleteCompetition()">Cancel</button>
+        <button class="confirm-btn" (click)="confirmDeleteCompetition()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Modal -->
+  <div *ngIf="showParticipantsModal" class="modal-overlay" (click)="closeParticipantsModal()">
+    <div class="modal-content participants-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <h3 style="margin:0;">Participants for {{ selectedCompetition?.comp_name }}</h3>
+        <button class="header-btn" (click)="closeParticipantsModal()" style="background:transparent; border:none; color:#f1f5f9; cursor:pointer;"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div *ngIf="participantsLoading" class="no-data" style="padding: 32px 0; border: none; background: transparent;">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading participants...</p>
+      </div>
+
+      <div *ngIf="!participantsLoading && participantsError" class="no-data" style="border-color: rgba(239, 68, 68, 0.3); padding: 32px 0;">
+        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+        <p>{{ participantsError }}</p>
+      </div>
+
+      <div *ngIf="!participantsLoading && !participantsError && participants.length === 0" class="no-data" style="padding: 32px 0; border: none; background: transparent;">
+        <i class="fas fa-users-slash"></i>
+        <p>No participants registered yet.</p>
+      </div>
+
+      <div *ngIf="!participantsLoading && !participantsError && participants.length > 0" class="participants-list" style="max-height: 400px; overflow-y: auto; text-align: left;">
+        <div *ngFor="let p of participants; let i = index" style="padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05);">
+          <!-- Participants format according to your actual items, keeping generic if unsure -->
+          <div style="font-weight: 500; margin-bottom: 4px;">{{ p.name || 'Participant ' + (i+1) }}</div>
+          <div style="font-size: 0.85rem; color: #94a3b8;">{{ p.details || p.chest_number || p.email || 'No additional details' }}</div>
+        </div>
+      </div>
+      
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button class="cancel-btn" style="width: 100%;" (click)="closeParticipantsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+

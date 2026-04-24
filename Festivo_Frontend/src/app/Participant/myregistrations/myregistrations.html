@@ -1,0 +1,143 @@
+<section class="registrations-section" id="my-registrations">
+    <div class="container relative-z fade-in-up">
+
+        <div class="page-header">
+            <div>
+                <h1 class="premium-title">My Registrations</h1>
+                <p class="premium-subtitle">View all the competitions you have registered for.</p>
+            </div>
+            <div class="header-badge" *ngIf="!isLoading">
+                <span>{{ registrations.length }}</span>
+                <span class="badge-label">Registered</span>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state glass-panel" *ngIf="isLoading">
+            <div class="spinner"></div>
+            <p>Loading your registrations...</p>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state glass-panel" *ngIf="errorMessage && !isLoading">
+            <div class="icon-wrap error-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3>Oops! Something went wrong</h3>
+            <p>{{ errorMessage }}</p>
+        </div>
+
+        <div class="filter-bar" *ngIf="!isLoading && !errorMessage && registrations.length > 0">
+            <div class="search-box">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search competitions, festivals or institutions..." class="search-input">
+            </div>
+            <div class="filter-box">
+                <i class="fa-solid fa-filter filter-icon"></i>
+                <select [(ngModel)]="filterStatus" class="filter-select">
+                    <option value="all">All Registrations</option>
+                    <option value="pending">Pending</option>
+                    <option value="present">Present</option>
+                    <option value="absent">Absent</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Empty State (No global registrations) -->
+        <div class="empty-state glass-panel" *ngIf="!isLoading && !errorMessage && registrations.length === 0">
+            <div class="icon-wrap">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <h3>No Registrations Found</h3>
+            <p>You haven't registered for any competitions yet. Discover active festivals and join the fun!</p>
+            <button class="btn-primary-glow neon-btn" routerLink="/participantmaster/viewallfests" style="margin-top: 20px;">
+                Explore Festivals
+            </button>
+        </div>
+
+        <!-- No Filter Results State -->
+        <div class="empty-filter glass-panel" *ngIf="!isLoading && !errorMessage && registrations.length > 0 && filteredRegistrations.length === 0">
+            <i class="fa-solid fa-face-frown-open"></i>
+            <h4>No Matches Found</h4>
+            <p>We couldn't find any registrations matching your current search and filter settings.</p>
+            <button class="btn-secondary neon-btn" (click)="searchTerm = ''; filterStatus = 'all'">Reset Filters</button>
+        </div>
+
+        <!-- Grid -->
+        <div class="registrations-grid" *ngIf="!isLoading && filteredRegistrations.length > 0">
+            <div class="floating-card reg-card bento-card" *ngFor="let reg of filteredRegistrations; let i = index" [style.--animation-order]="i">
+                <div class="card-header bento-card">
+                    <div class="fest-name">
+                        <i class="fa-solid fa-tents"></i>
+                        {{ reg.fest_name }}
+                    </div>
+                </div>
+
+                <div class="card-body bento-card">
+                    <h3 class="comp-title">{{ reg.competition_name }}</h3>
+                    <p class="inst-name"><i class="fa-solid fa-building-columns"></i> {{ reg.institution_name }}</p>
+
+                    <div class="bento-details">
+                        <div class="detail-item">
+                            <span class="meta-label"><i class="fa-regular fa-calendar"></i> DATE</span>
+                            <span class="meta-value">{{ reg.competition_date | date: 'dd MMM, yyyy' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="meta-label"><i class="fa-solid fa-users"></i> TYPE</span>
+                            <span class="meta-value type-badge">{{ reg.type }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="meta-label"><i class="fa-solid fa-clipboard-user"></i> ATTD</span>
+                            <span class="meta-value" [ngClass]="{'text-success': getAttendanceDisplay(reg) === 'present', 'text-warning': getAttendanceDisplay(reg) === 'pending', 'text-danger': getAttendanceDisplay(reg) === 'absent'}" style="text-transform: capitalize;">
+                                {{ getAttendanceDisplay(reg) }}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="meta-label"><i class="fa-solid fa-clock-rotate-left"></i> REG. ON</span>
+                            <span class="meta-value">{{ reg.regdate | date: 'dd MMM, yy' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div class="result-banner" *ngIf="reg.res_status === 'published' && reg.position">
+                        <div class="medal-icon">
+                            <i class="fa-solid fa-medal" 
+                               [ngClass]="{'gold': reg.position === '1', 'silver': reg.position === '2', 'bronze': reg.position === '3'}">
+                            </i>
+                        </div>
+                        <div class="result-info">
+                            <span class="result-label">Result Published</span>
+                            <span class="position-text">Position: {{ reg.position }}</span>
+                        </div>
+                        <button class="btn-sm-primary ml-auto neon-btn">View Result</button>
+                    </div>
+                    
+                    <div class="result-banner empty-result" *ngIf="reg.res_status === 'published' && !reg.position">
+                         <div class="result-info">
+                             <span class="result-label">Result Published</span>
+                             <span class="position-text">Participated</span>
+                         </div>
+                         <button class="btn-sm-primary ml-auto neon-btn">View Result</button>
+                    </div>
+
+                    <!-- Pending Result Status -->
+                    <div class="result-banner pending-result" *ngIf="reg.res_status !== 'published' && isCompetitionEnded(reg.competition_date)">
+                        <div class="medal-icon pending-icon">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                        <div class="result-info">
+                            <span class="result-label">Status</span>
+                            <span class="position-text">Result Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bento-card">
+                    <button class="btn-ghost-glow w-100 neon-btn" [routerLink]="['/participantmaster/registrationdetails', reg.competitionregid]">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

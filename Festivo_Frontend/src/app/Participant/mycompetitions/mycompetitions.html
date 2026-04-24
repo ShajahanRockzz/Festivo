@@ -1,0 +1,242 @@
+
+<div class="content-wrapper fade-in-up my-4">
+  <div class="two-column-layout">
+    
+    <!-- LEFT COLUMN -->
+    <div class="left-column">
+      <!-- Dynamic Hero Header -->
+      <div class="glass-bento p-5 bento-hero text-center position-relative overflow-hidden w-100">
+        <div class="position-relative z-1 d-flex flex-column h-100 justify-content-center align-items-center">
+          <h1 class="display-4 fw-bold text-white mb-3" *ngIf="!selectedFest">
+            My <span class="text-neon-gradient">Registered Fests</span>
+          </h1>
+          <h1 class="display-4 fw-bold text-white mb-3" *ngIf="selectedFest">
+            <span class="text-neon-gradient">{{ selectedFest?.fest_name }}</span>
+          </h1>
+          <p class="lead text-white-50 mx-auto" style="max-width: 600px;" *ngIf="!selectedFest">
+            Select a fest below to view your registered competitions and results.
+          </p>
+          <p class="lead text-white-50 mx-auto" style="max-width: 600px;" *ngIf="selectedFest">
+            {{ selectedFest?.institution_name }}
+          </p>
+        </div>
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-noise opacity-10 pointer-events-none"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-column">
+      
+      <div *ngIf="isLoading" class="text-center py-5 w-100 glass-bento">
+        <div class="spinner-border text-neon" role="status"></div>
+        <p class="text-white mt-3 mb-0">Loading your logs...</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert position-bento border-0 text-white bg-danger bg-opacity-75 p-4 rounded-4 text-center w-100">
+        <i class="bi bi-exclamation-triangle fs-3 d-block mb-2"></i>
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!isLoading && groupedFests.length === 0 && !errorMessage" class="text-center py-5 w-100">
+        <div class="glass-bento p-5 d-inline-block w-100">
+          <i class="bi bi-emoji-frown text-white-50 fs-1 mb-3 d-block"></i>
+          <h4 class="text-white">No Participations Found</h4>
+          <p class="text-white-50">It looks like you haven't registered for any events yet!</p>
+          <button class="btn btn-outline-neon mt-3 neon-btn" routerLink="/participantmaster/viewallfests">
+            Find a Fest
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: FEST CARDS GRID -->
+      <div *ngIf="!isLoading && groupedFests.length > 0 && !selectedFest" class="w-100">
+        <div class="cards-grid">
+          <div *ngFor="let fest of groupedFests" class="h-100">
+            <div class="fest-card glass-bento bg-dark h-100 p-0 overflow-hidden d-flex flex-column pointer-cursor border border-secondary" (click)="selectFest(fest)">
+              <div class="card-img-wrapper position-relative">
+                <img [src]="getFestImage(fest.fest_image)" class="w-100 h-100 object-fit-cover" alt="Fest Poster" onerror="this.src='/assets/images/placeholder.jpg'" />
+                <div class="position-absolute top-0 end-0 m-3 z-3">
+                   <span class="badge bg-dark border border-secondary text-white shadow p-2">
+                     {{ fest.competitions.length }} Competition(s)
+                   </span>
+                </div>
+                <div class="gradient-overlay position-absolute bottom-0 start-0 w-100 h-50 z-2"></div>
+              </div>
+              <div class="card-content p-4 bg-dark bg-opacity-75 flex-grow-1 d-flex flex-column position-relative z-3">
+                <h3 class="text-neon fw-bold mb-1 text-truncate" [title]="fest.fest_name">{{ fest.fest_name }}</h3>
+                <p class="text-white-50 mb-3 small text-truncate" [title]="fest.institution_name"><i class="bi bi-building me-2"></i>{{ fest.institution_name }}</p>
+                <div class="mt-auto">
+                   <button class="btn btn-outline-neon w-100 neon-btn">View Events <i class="bi bi-arrow-right ms-2"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: SELECTED FEST COMPETITIONS -->
+      <div *ngIf="selectedFest" class="w-100">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3">
+          <button class="btn btn-back neon-btn" (click)="goBack()">  
+            <i class="bi bi-arrow-left me-2"></i> Back to Fests
+          </button>
+          
+          <div class="d-flex flex-wrap gap-3 flex-grow-1 justify-content-end">
+            <div class="position-relative search-container">
+              <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+              <input type="text" class="form-control glass-input w-100 ps-5" placeholder="Search competitions by name..." [(ngModel)]="searchTerm">
+            </div>
+            <div class="filter-container">
+              <select class="form-select glass-input w-100 px-4" [(ngModel)]="statusFilter">
+                <option value="all" class="bg-dark text-white">All Status</option>
+                <option value="published" class="bg-dark text-white">Published</option>
+                <option value="pending" class="bg-dark text-white">Pending</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Competitions List Cards -->
+        <div class="cards-grid">
+           <div *ngFor="let comp of filteredCompetitions" class="h-100">
+              <div class="comp-card h-100 d-flex flex-column position-relative overflow-hidden result-glow"
+                  [ngClass]="{
+                      'glow-success': comp.position === 'First',
+                      'glow-secondary': comp.position === 'Second',
+                      'glow-warning': comp.position === 'Third'
+                  }">
+
+                  <!-- Card Image -->
+                  <div class="comp-img-wrapper position-relative">
+                      <img [src]="getCompetitionImage(comp.image)" class="w-100 h-100 object-fit-cover" alt="Competition Image" onerror="this.src='/assets/images/placeholder.jpg'" />
+                      <div class="gradient-overlay position-absolute bottom-0 start-0 w-100 h-50"></div>
+                  </div>
+
+                  <div class="comp-content-wrapper">
+                    <div class="d-flex justify-content-between align-items-start comp-header pb-3 mb-3">
+                       <div class="overflow-hidden pe-2">
+                          <h4 class="comp-title text-truncate" title="{{ comp.competition_name }}">{{ comp.competition_name }}</h4>
+                          <span class="badge" [ngClass]="comp.type === 'single' ? 'badge-blue' : 'badge-purple'">
+                            <i class="bi" [ngClass]="comp.type === 'single' ? 'bi-person-fill' : 'bi-people-fill'"></i> {{ comp.type | uppercase }} EVENT
+                          </span>
+                       </div>
+                       <div class="text-end flex-shrink-0">
+                          <span class="comp-date"><i class="bi bi-calendar-event me-1"></i>{{ comp.competition_date | date:'MMM d, y' }}</span>
+                       </div>
+                    </div>
+
+                    <!-- Main Result Bar inside the card -->
+                    <div class="result-bar mt-auto d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                          <span class="text-slate-400 small fw-semibold" style="color: #94a3b8;">Result:</span>
+
+                          <ng-container *ngIf="comp.res_status === 'published'; else resPending">
+                              <span class="badge border"
+                                    [ngClass]="{
+                                      'badge-first': comp.position === 'First',
+                                      'badge-second': comp.position === 'Second',
+                                      'badge-third': comp.position === 'Third',
+                                      'badge-pending': !['First','Second','Third'].includes(comp.position) && comp.position
+                                    }">
+                                <i class="bi bi-trophy-fill me-1" *ngIf="['First','Second','Third'].includes(comp.position)"></i>
+                                <i class="bi bi-check-circle-fill me-1" *ngIf="!['First','Second','Third'].includes(comp.position)"></i>
+                                {{ comp.position || 'Participated' }}
+                              </span>
+                          </ng-container>
+
+                          <ng-template #resPending>
+                             <span class="badge badge-pending">
+                               <i class="bi bi-clock me-1"></i> Pending
+                             </span>
+                          </ng-template>
+                        </div>
+
+                        <button class="btn-neon w-100 neon-btn" (click)="viewLeaderboard(comp)">
+                            Leaderboard <i class="bi bi-bar-chart-fill ms-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Certificate Button -->
+                    <div class="mt-2 w-100" *ngIf="comp.res_status === 'published' && ['First', 'Second', 'Third'].includes(comp.position)">
+                      <button class="btn btn-cert w-100 d-flex align-items-center justify-content-center gap-2 neon-btn" (click)="downloadCertificate(comp)">
+                          <i class="bi bi-patch-check-fill fs-5"></i> Download Certificate
+                      </button>
+                    </div>
+                  </div>
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal Overlay -->
+  <div class="modal fade show d-block" *ngIf="leaderboardVisible" tabindex="-1" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px)">
+    <div class="modal-dialog modal-lg" style="margin-top: 10vh;">
+      <div class="modal-content glass-bento border-secondary bg-dark">
+        <div class="modal-header border-secondary border-bottom">
+          <h4 class="modal-title text-neon fw-bold mb-0">
+            <i class="bi bi-trophy me-2"></i> Leaderboard
+            <span class="d-block text-white fs-6 mt-1 fw-normal" *ngIf="selectedCompetitionForLeaderboard">
+              {{ selectedCompetitionForLeaderboard.competition_name }}
+            </span>
+          </h4>
+          <button type="button" class="btn text-white neon-btn" style="background: transparent !important; box-shadow: none !important; opacity: 0.8;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" (click)="closeLeaderboard()"><i class="bi bi-x-lg fs-5"></i></button>
+        </div>
+        
+        <div class="modal-body p-4">
+          <div *ngIf="isLeaderboardLoading" class="text-center py-4">
+            <div class="spinner-border text-neon" role="status"></div>
+            <p class="text-white-50 mt-2">Loading statistics...</p>
+          </div>
+
+          <div *ngIf="!isLeaderboardLoading && leaderboardData.length === 0" class="text-center py-4">
+            <i class="bi bi-shield-x fs-1 text-white-50 mb-2 d-block"></i>
+            <h5 class="text-white">Awaiting Results</h5>
+            <p class="text-white-50">No winners have been announced for this event yet.</p>
+          </div>
+
+          <!-- Leaderboard List -->
+          <div *ngIf="!isLeaderboardLoading && leaderboardData.length > 0" class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center p-3 rounded-4 glass-bento leaderboard-row" 
+                 *ngFor="let participant of leaderboardData; let i = index"
+                 [ngClass]="{
+                   'leaderboard-first': participant.position === 'First',
+                   'leaderboard-second': participant.position === 'Second',
+                   'leaderboard-third': participant.position === 'Third'
+                 }">
+               
+               <div class="me-4 position-relative">
+                  <div class="fs-2 text-white opacity-75 fw-bold position-number">
+                     <h1>#{{ i + 1 }}</h1>
+                  </div>
+               </div>
+
+               <div class="flex-grow-1">
+                 <h5 class="text-white mb-1 mb-0">{{ participant.participantname || 'Participant' }}</h5>
+                 <span class="text-white-50 small">Competitor ID: {{ participant.competition_reg_id }}</span>
+               </div>
+               
+               <div class="text-end">
+                 <span class="badge border px-3 py-2 fs-6 shadow-sm badge-position"
+                   [ngClass]="{
+                     'badge-first': participant.position === 'First',
+                     'badge-second': participant.position === 'Second',
+                     'badge-third': participant.position === 'Third'
+                   }">
+                   {{ participant.position }} Place
+                 </span>
+               </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="modal-footer border-secondary border-top">
+          <button type="button" class="btn btn-outline-secondary text-white w-100 neon-btn" (click)="closeLeaderboard()">Close Leaderboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+

@@ -1,0 +1,153 @@
+<div class="registration-container fade-in-up">
+  <div class="registration-wrapper grid-wrapper">
+    <div class="registration-header">
+      <h1>Register for {{ competitionDetails?.competition_name || 'Competition' }}</h1>
+      <p *ngIf="competitionDetails" class="fee-text">Join the contest! Registration Fee: Rs {{ competitionDetails?.reg_fee }}</p>
+    </div>
+
+    <div class="registration-content">
+      <div *ngIf="isLoading" style="text-align: center; padding: 2rem;">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Loading details...</p>
+      </div>
+
+      <form *ngIf="!isLoading && competitionDetails" (ngSubmit)="submitRegistration()" #registrationForm="ngForm">
+        <div class="form-section" *ngIf="!showPayment">
+          <h2 class="section-title"><i class="fas fa-clipboard-check"></i> Registration Details</h2>
+
+          <div class="form-group status-text" *ngIf="competitionDetails.type === 'single' || competitionDetails.type === 'individual'">
+            <p><strong>Type:</strong> Individual / Single Competition</p>
+            <p>You will be registered under your profile name: {{ currentUser?.participantname }}.</p>
+            <p class="fee-text" style="font-weight: 600; margin-top: 10px;" *ngIf="competitionDetails.reg_fee > 0">Please confirm to proceed with payment.</p>
+          </div>
+
+          <div *ngIf="competitionDetails.type === 'group'" class="form-group status-text">
+            <p><strong>Type:</strong> Group Competition</p>
+            <p>Members Required: {{ minMembers }} to {{ maxMembers }}</p>
+
+            <div class="members-container fade-in-up">
+              <h3><i class="fas fa-users"></i> Additional Team Members</h3>
+              
+              <div class="member-card bento-card" *ngFor="let member of groupMembers; let i = index">
+                <div style="display:flex; justify-content:space-between; margin-bottom:1rem; align-items:center;">
+                   <h4>Member {{ i + 2 }}</h4>
+                   <button type="button" *ngIf="i >= (minMembers - 1)" (click)="removeMember(i)" style="color:#ef4444; background:none; border:none; cursor:pointer; font-weight:600;"><i class="fas fa-times"></i> Remove</button>
+                </div>
+
+                <div class="form-group">
+                   <label>Name *</label>
+                   <input type="text" [(ngModel)]="member.name" name="memberName_{{i}}" [required]="!showPayment">
+                </div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                   <div class="form-group">
+                      <label>Email *</label>
+                      <input type="email" [(ngModel)]="member.email" name="memberEmail_{{i}}" [required]="!showPayment" email #mEmail="ngModel">
+                        <small *ngIf="mEmail.invalid && mEmail.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Valid email required</small>
+                   </div>
+                   <div class="form-group">
+                      <label>Contact No *</label>
+                        <input type="text" [ngModel]="member.contact" (ngModelChange)="onContactChange($event, i)" name="memberContact_{{i}}" [required]="!showPayment" pattern="^[0-9]{10}$" maxlength="10" placeholder="10-digit number" #mContact="ngModel">
+                        <small *ngIf="mContact.invalid && mContact.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Valid 10-digit number required</small>
+                   </div>
+                </div>
+                
+                <div class="form-group file-upload-group">
+                   <label>College ID Proof (Image) *</label>
+                   
+                   <div class="file-upload-wrapper grid-wrapper" [class.has-file]="member.idProofFile">
+                      <div class="file-upload-content" *ngIf="!member.idProofPreview">
+                         <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#38bdf8;margin-bottom:0.8rem;"></i>
+                         <span style="color:#cbd5e1;font-size:0.9rem;">Click or drag here to upload ID</span>
+                      </div>
+                      
+                      <div class="file-preview" *ngIf="member.idProofPreview">
+                         <img [src]="member.idProofPreview" alt="ID Preview" style="width:100%;height:100px;object-fit:contain;border-radius:8px;">
+                         <div class="file-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;border-radius:8px;opacity:0;transition:0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+                            <span style="color:white;font-weight:600;"><i class="fas fa-edit"></i> Change File</span>
+                         </div>
+                      </div>
+
+                      <input type="file" class="file-input-overlay" (change)="onFileChange($event, i)" name="memberIdProof_{{i}}" accept="image/*" [required]="!showPayment && !member.idProofFile">
+                   </div>
+                </div>
+              </div>
+
+              <button type="button" class="add-member-btn neon-btn" (click)="addMember()" *ngIf="groupMembers.length < (maxMembers - 1)">
+                <i class="fas fa-plus"></i> Add Another Member
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" *ngIf="!showPayment">
+          <button type="button" class="btn-cancel neon-btn" (click)="goBack()">Cancel</button>
+          <button type="button" class="btn-submit neon-btn" [disabled]="!registrationForm.form.valid" (click)="proceedToPayment()">
+            <span>Proceed</span>
+          </button>
+        </div>
+
+        <div class="form-section payment-section" *ngIf="showPayment">
+          <h2 class="section-title"><i class="fas fa-credit-card bento-card"></i> Payment Details</h2>
+          <p class="fee-text" style="margin-bottom: 20px;">Amount to Pay: <strong>Rs {{ competitionDetails?.reg_fee }}</strong></p>
+          
+          <div class="form-group">
+            <label>Cardholder Name *</label>
+            <input type="text" [(ngModel)]="paymentDetails.cardHolder" name="cardHolder" [required]="showPayment" pattern="^[a-zA-Z\s]+$" placeholder="Enter name on card" #cname="ngModel">
+            <small *ngIf="cname.invalid && cname.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Please enter a valid name (letters only)</small>
+          </div>
+          
+          <div class="form-group">
+            <label>Card Number *</label>
+            <input type="text" [ngModel]="paymentDetails.cardNumber" (ngModelChange)="onCardNumberChange($event)" name="cardNumber" [required]="showPayment" pattern="^[0-9\s]{16,19}$" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" #cnum="ngModel">
+            <small *ngIf="cnum.invalid && cnum.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Valid 16-digit card number required</small>
+          </div>
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label>Expiry Date *</label>
+              <input type="text" [ngModel]="paymentDetails.expiryDate" (ngModelChange)="onExpiryDateChange($event)" name="expiryDate" [required]="showPayment" pattern="^(0[1-9]|1[0-2])/\d{2}$" placeholder="MM/YY" maxlength="5" #exp="ngModel">
+              <small *ngIf="exp.invalid && exp.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Format MM/YY required</small>
+              <small *ngIf="isExpiryInvalid && exp.valid" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Card has expired</small>
+            </div>
+            <div class="form-group">
+              <label>CVV *</label>
+                <input type="password" [ngModel]="paymentDetails.cvv" (ngModelChange)="onCvvChange($event)" name="cvv" [required]="showPayment" pattern="^\d{3}$" placeholder="XXX" maxlength="3" #cvv="ngModel">
+              <small *ngIf="cvv.invalid && cvv.touched" style="color:#ef4444; font-size:12px; margin-top:5px; display:block;">Valid 3-digit CVV required</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" *ngIf="showPayment">
+          <button type="button" class="btn-cancel neon-btn" (click)="showPayment = false">Back</button>
+          <button type="submit" class="btn-submit neon-btn" [disabled]="!registrationForm.form.valid || isSubmitting || isExpiryInvalid">
+            <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+            <span *ngIf="!isSubmitting">Pay & Register</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="custom-modal-overlay" *ngIf="showSuccessModal">
+    <div class="custom-modal">
+      <div class="modal-icon">
+        <i class="fas fa-check-circle" style="color: #4ade80;"></i>
+      </div>
+      <h2 style="margin-top: 15px;">Success!</h2>
+      <p style="margin: 15px 0;">You have successfully registered for the competition.</p>
+      <button class="btn-submit neon-btn" (click)="closeModalAndGoBack()" style="width: 100%;">OK</button>
+    </div>
+  </div>
+
+  <div class="custom-modal-overlay" *ngIf="showErrorModal">
+    <div class="custom-modal">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+      </div>
+      <h2 style="margin-top: 15px;">Registration Failed</h2>
+      <p style="margin: 15px 0;">{{ errorMessage }}</p>
+      <button class="btn-cancel neon-btn" (click)="closeErrorModal()" style="width: 100%;">Close</button>
+    </div>
+  </div>
+</div>

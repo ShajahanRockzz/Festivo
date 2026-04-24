@@ -1,0 +1,127 @@
+<div class="competitiondetails-container fade-in-up">
+	<button class="btn-back neon-btn" (click)="goBack()">← Back</button>
+
+	<div *ngIf="isLoading" class="loading-state">
+		<div class="spinner"></div>
+		<p>Loading competition details...</p>
+	</div>
+
+	<div *ngIf="!isLoading && errorMessage" class="error-state">
+		<p>⚠️ {{ errorMessage }}</p>
+	</div>
+
+	<div *ngIf="!isLoading && competition" class="details-card bento-card">
+		<div class="image-wrap">
+			<img [src]="getImageUrl(competition.image)" [alt]="competition.competition_name" />
+			<span class="status" [ngClass]="competition.res_status === 'published' ? 'published' : 'pending'">
+				{{ competition.res_status | uppercase }}
+			</span>
+		</div>
+
+		<div class="details-content">
+			<div class="header-row">
+				<h1>{{ competition.competition_name }}</h1>
+				<span class="type" [ngClass]="competition.type">
+					{{ competition.type | titlecase }}
+				</span>
+			</div>
+
+			<p class="description" *ngIf="competition.description">
+				{{ competition.description }}
+			</p>
+
+			<div class="meta-grid">
+				<div class="meta-item" *ngIf="festName">
+					<span class="label">Fest Name</span>
+					<span class="value">{{ festName }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Date</span>
+					<span class="value">{{ competition.competition_date | date:'MMM dd, yyyy' }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Registration Date</span>
+					<span class="value">{{ competition.reg_date | date:'MMM dd, yyyy' }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Type</span>
+					<span class="value">{{ competition.type | titlecase }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Members (Min / Max)</span>
+					<span class="value">{{ competition.min_members }} / {{ competition.max_members }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Group Limit</span>
+					<span class="value">{{ competition.grouplimit }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Fee</span>
+					<span class="value">₹{{ competition.reg_fee }}</span>
+				</div>
+				<div class="meta-item">
+					<span class="label">Result Status</span>
+					<span class="value">{{ competition.res_status | titlecase }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="registrations-card bento-card" *ngIf="!isLoading">
+		<div class="section-header">
+			<h2>Registration Details</h2>
+			<span class="count">{{ registrations.length }} registered</span>
+		</div>
+
+		<div *ngIf="registrationsLoading" class="loading-state">
+			<div class="spinner"></div>
+			<p>Loading registrations...</p>
+		</div>
+
+		<div *ngIf="!registrationsLoading && registrationsError" class="error-state">
+			<p>⚠️ {{ registrationsError }}</p>
+		</div>
+
+		<div *ngIf="!registrationsLoading && !registrationsError && registrations.length === 0" class="empty-state">
+			<p>No registrations found for this competition.</p>
+		</div>
+
+		<div *ngIf="!registrationsLoading && registrations.length > 0" class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>Reg ID</th>
+						<th>Competition ID</th>
+						<th>Participant</th>
+						<th>Email</th>
+						<th>Contact</th>
+						<th>Chess No</th>
+						<th>Attendance</th>
+						<th>Reg Date</th>
+						<th>Participant ID</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let reg of registrations">
+						<td>{{ reg.competitionregid }}</td>
+						<td>{{ reg.competitionid }}</td>
+						<td>
+							<div class="participant-cell">
+								<span class="name">{{ reg.participantname || 'Participant' }}</span>
+								<span class="subtext" *ngIf="isGroupCompetition && reg.groupMembers?.length">
+									{{ reg.groupMembers?.length || 0 }} group members
+								</span>
+							</div>
+						</td>
+						<td>{{ reg.participantemail || '-' }}</td>
+						<td>{{ reg.contact_no || '-' }}</td>
+						<td>{{ reg.chessno || '-' }}</td>
+						<td>{{ reg.attendance || '-' }}</td>
+						<td>{{ reg.regdate | date:'MMM dd, yyyy' }}</td>
+						<td>{{ reg.participantid }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

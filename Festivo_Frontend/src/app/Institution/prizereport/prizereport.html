@@ -1,0 +1,103 @@
+<div class="dashboard-container">
+  <div class="header">
+      <h1>Prize Report</h1>
+      <button class="export-btn" (click)="exportToPDF()">
+          <i class="bi bi-file-earmark-pdf"></i>
+          Export to PDF
+      </button>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card card" [formGroup]="filterForm">
+      <div class="card-header">
+          <h2><i class="bi bi-funnel"></i> Filter Prizewinners</h2>
+      </div>
+      <div class="card-body">
+          <div class="form-group">
+              <label for="selectedFest">Select Fest</label>
+              <select id="selectedFest" formControlName="selectedFest" class="form-control">
+                  <option value="All">All Fests</option>
+                  <option *ngFor="let fest of fests" [value]="fest">{{ fest }}</option>
+              </select>
+          </div>
+      </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-wrapper" *ngIf="filteredPrizes.length > 0">
+      <div class="card chart-card">
+          <div class="card-header">
+              <h2><i class="bi bi-bar-chart-fill"></i> {{ filterForm.get('selectedFest')?.value === 'All' ? 'Prizes per Fest' : 'Prizes per Competition' }}</h2>
+          </div>
+          <div class="card-body">
+              <div class="chart-container">
+                  <canvas baseChart
+                      [data]="barChartData"
+                      [options]="barChartOptions"
+                      [type]="barChartType">
+                  </canvas>
+              </div>
+          </div>
+      </div>
+      <div class="card chart-card">
+          <div class="card-header">
+              <h2><i class="bi bi-pie-chart-fill"></i> Top Winning Colleges</h2>
+          </div>
+          <div class="card-body">
+              <div class="chart-container">
+                  <canvas baseChart
+                      [data]="pieChartData"
+                      [options]="pieChartOptions"
+                      [type]="pieChartType">
+                  </canvas>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Prizes Table by Fest and Competition -->
+  <div class="card history-table-container fest-group-card" *ngFor="let fest of groupedData">
+      <div class="card-header bg-fest">
+          <h2 class="text-white m-0 d-flex align-items-center gap-2"><i class="bi bi-calendar2-star"></i> Fest: {{ fest.fest_name }}</h2>
+      </div>
+      
+      <div class="card-body p-0">
+          <div *ngFor="let comp of fest.competitions" class="competition-section">
+              <div class="competition-header">
+                  <h3><i class="bi bi-trophy"></i> {{ comp.competition_name }}</h3>
+              </div>
+              <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                      <thead class="table-light">
+                          <tr>
+                              <th style="width: 20%;">Position</th>
+                              <th>Participant Name</th>
+                              <th>Participant College</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let prize of comp.prizes">
+                              <td>
+                                  <span class="position-badge position-{{prize.position}}">
+                                      {{ prize.position == '1' ? '1st' : prize.position == '2' ? '2nd' : prize.position == '3' ? '3rd' : prize.position + 'th' }}
+                                  </span>
+                              </td>
+                              <td class="fw-bold text-dark">{{ prize.participantname }}</td>
+                              <td>{{ prize.participant_college }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredPrizes.length === 0" class="card history-table-container">
+      <div class="card-body text-center text-muted py-5 empty-state">
+          <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+          <h4>No prize data found</h4>
+          <p>Try selecting a different fest or ensure results are published.</p>
+      </div>
+  </div>
+</div>

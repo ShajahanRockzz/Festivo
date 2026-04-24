@@ -1,0 +1,419 @@
+<div class="participants-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <span class="arrow">←</span>
+      <span>Back</span>
+    </button>
+    <div class="header-content">
+      <h1>Manage Participants</h1>
+      <p>{{ competitionName }}</p>
+      <div *ngIf="isResultPublished" class="published-badge">
+        🔒 Results Published - No further edits are allowed
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="message-container" *ngIf="successMessage">
+    <div class="alert alert-success">
+      <span class="icon">✓</span>
+      {{ successMessage }}
+    </div>
+  </div>
+
+  <div class="message-container" *ngIf="errorMessage">
+    <div class="alert alert-error">
+      <span class="icon">✕</span>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading participants...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && participants.length === 0">
+    <div class="empty-icon">👥</div>
+    <h2>No Participants</h2>
+    <p>No participants have registered for this competition yet.</p>
+  </div>
+
+  <!-- Participants Management Section -->
+  <div class="participants-management" *ngIf="!isLoading && participants.length > 0">
+    <!-- Search Bar -->
+    <div class="search-section">
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="Search by name, email or contact..."
+        [(ngModel)]="searchQuery"
+        (input)="filterParticipants()">
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-navigation">
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'all'"
+        (click)="setActiveTab('all')">
+        <span class="tab-icon">👥</span>
+        <span>All Participants</span>
+        <span class="count">({{ filteredParticipants.length }})</span>
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'chess'"
+        (click)="setActiveTab('chess')">
+        <span class="tab-icon">🎯</span>
+        <span>Chess Numbers</span>
+        <span class="count">({{ filteredParticipants.length }})</span>
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'attendance'"
+        (click)="setActiveTab('attendance')">
+        <span class="tab-icon">📋</span>
+        <span>Attendance</span>
+        <span class="count">({{ filteredParticipants.length }})</span>
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'result'"
+        (click)="setActiveTab('result')">
+        <span class="tab-icon">🏆</span>
+        <span>Results</span>
+        <span class="count">({{ filteredParticipants.length }})</span>
+      </button>
+    </div>
+
+    <!-- Content Section -->
+    <div class="section-content">
+      <!-- All Participants Section -->
+      <div class="section" *ngIf="activeTab === 'all'">
+        <div class="section-title">
+          <h2>All Participants</h2>
+          <p>Complete participant details and information</p>
+        </div>
+
+        <div class="participants-list">
+          <div class="participant-card" [class.expanded]="expandedCards[participant.competitionregid]" *ngFor="let participant of filteredParticipants">
+            <!-- Compact Header -->
+            <div class="participant-header-compact">
+              <div class="participant-avatar">
+                <img [src]="'http://localhost:3000/uploads/' + participant.participantimage" 
+                     *ngIf="participant.participantimage"
+                     [alt]="participant.participantname"
+                     class="profile-image"
+                     (error)="onProfileImageError($event)">
+                <span *ngIf="!participant.participantimage" class="avatar-placeholder">👤</span>
+              </div>
+              <div class="participant-basic-info">
+                <h3>{{ participant.participantname }}</h3>
+                <p class="participant-id">ID: {{ participant.participantid }}</p>
+                <p class="participant-email">{{ participant.participantemail }}</p>
+                <p class="participant-contact">📱 {{ participant.contact_no }}</p>
+                <div class="participant-meta-info">
+                  <span class="meta-item">🎯 Chess: {{ participant.chessno || '-' }}</span>
+                  <span class="meta-item" [class.present]="participant.attendance === 'present'" [class.absent]="participant.attendance === 'absent'">
+                    ✓ {{ participant.attendance || '-' }}
+                  </span>
+                </div>
+              </div>
+              <button class="btn-expand" (click)="toggleCardExpand(participant.competitionregid)" [attr.aria-label]="expandedCards[participant.competitionregid] ? 'Collapse' : 'Expand'">
+                <span class="expand-icon">{{ expandedCards[participant.competitionregid] ? '▼' : '▶' }}</span>
+              </button>
+            </div>
+
+            <!-- Expanded Content -->
+            <div class="participant-expanded-content" *ngIf="expandedCards[participant.competitionregid]">
+              <!-- ID Proof Section -->
+              <div class="id-proof-section" *ngIf="participant.institution_id_proof">
+                <label class="proof-label">📷 ID Proof:</label>
+                <div class="proof-image-container" #idProofContainer>
+                  <ng-container *ngIf="isPdf(participant.institution_id_proof); else imageProof">
+                    <a [href]="'http://localhost:3000/uploads/' + participant.institution_id_proof" target="_blank" class="pdf-link">
+                      📄 View PDF ID Proof
+                    </a>
+                  </ng-container>
+                  <ng-template #imageProof>
+                    <img [src]="'http://localhost:3000/uploads/' + participant.institution_id_proof" 
+                         [alt]="participant.participantname + ' ID Proof'"
+                         class="id-proof-image"
+                         (error)="onIdProofImageError($event)">
+                  </ng-template>
+                </div>
+              </div>
+
+              <!-- Group Members Section (Only for Group Competitions) -->
+              <div class="group-members-section" *ngIf="competitionType === 'group' && participant.groupMembers && participant.groupMembers.length > 0">
+                <h4>👨‍👩‍👧‍👦 Group Members ({{ participant.groupMembers.length }})</h4>
+                <div class="group-members-list">
+                  <div class="group-member-card" *ngFor="let member of participant.groupMembers; let i = index">
+                    <div class="member-index">{{ i + 1 }}</div>
+                    <div class="member-details">
+                      <div class="member-name-section">
+                        <p class="member-name">{{ member.participantname }}</p>
+                      </div>
+                      <div class="member-info-grid">
+                        <div class="info-item">
+                          <span class="info-label">Email:</span>
+                          <p class="info-value">{{ member.email }}</p>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">Contact:</span>
+                          <p class="info-value">{{ member.contact_no }}</p>
+                        </div>
+                        <div class="info-item" *ngIf="member.institution_name">
+                          <span class="info-label">Institution:</span>
+                          <p class="info-value">{{ member.institution_name }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ID Proof Section for Group Member -->
+                    <div class="member-id-proof" *ngIf="member.collegeidproof">
+                      <span class="proof-label">📷 ID Proof</span>
+                      <ng-container *ngIf="isPdf(member.collegeidproof); else memberImageProof">
+                        <a [href]="'http://localhost:3000/uploads/' + member.collegeidproof" target="_blank" class="pdf-link-small">
+                          📄 View PDF
+                        </a>
+                      </ng-container>
+                      <ng-template #memberImageProof>
+                        <img [src]="'http://localhost:3000/uploads/' + member.collegeidproof" 
+                             [alt]="member.participantname + ' ID Proof'"
+                             class="id-proof-image-small"
+                             (error)="onGroupMemberIdProofError($event)">
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section" *ngIf="activeTab === 'chess'">
+        <div class="section-title">
+          <h2>Assign Chess Numbers</h2>
+          <p>Assign unique chess numbers to participants</p>
+        </div>
+
+        <!-- Bulk Assignment Section -->
+        <div class="bulk-assignment-section">
+          <div class="bulk-header">
+            <h3>⚡ Bulk Assign Numbers</h3>
+            <p>Automatically assign sequential numbers starting from a value</p>
+          </div>
+          <div class="bulk-form">
+            <input 
+              type="number"
+              [(ngModel)]="bulkStartingNumber"
+              class="input-starting-number"
+              placeholder="Enter starting number (e.g., 101)"
+              min="1"
+              [disabled]="bulkAssigning">
+            <button 
+              class="btn-bulk-assign"
+              (click)="bulkAssignChessNumbers()"
+              [disabled]="bulkAssigning || !bulkStartingNumber || isResultPublished">
+              <span *ngIf="!bulkAssigning">Bulk Assign</span>
+              <span *ngIf="bulkAssigning">Assigning...</span>
+            </button>
+            <div class="bulk-info">
+              <span class="info-text">Will assign to {{ filteredParticipants.length > 0 ? filteredParticipants.length : participants.length }} participant(s)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="participants-list">
+          <div class="participant-item" *ngFor="let participant of filteredParticipants">
+            <div class="participant-info">
+              <div class="participant-name">{{ participant.participantname }}</div>
+              <div class="participant-details">
+                <span class="email">{{ participant.participantemail }}</span>
+                <span class="contact">{{ participant.contact_no }}</span>
+              </div>
+            </div>
+
+            <div class="section-action">
+              <div *ngIf="!editingChessNo[participant.competitionregid]" class="view-mode">
+                <span class="value">{{ participant.chessno || '-' }}</span>
+                <button 
+                  class="btn-edit"
+                  (click)="toggleEditChessNo(participant.competitionregid)"
+                  [disabled]="isResultPublished">
+                  ✏️ Edit
+                </button>
+              </div>
+              <div *ngIf="editingChessNo[participant.competitionregid]" class="edit-mode">
+                <input 
+                  type="number" 
+                  [(ngModel)]="participant.chessno"
+                  class="input-field"
+                  placeholder="Enter chess number"
+                  min="1">
+                <button 
+                  class="btn-save"
+                  (click)="saveChessNo(participant)">
+                  Save
+                </button>
+                <button 
+                  class="btn-cancel"
+                  (click)="toggleEditChessNo(participant.competitionregid)">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Section -->
+      <div class="section" *ngIf="activeTab === 'attendance'">
+        <div class="section-title">
+          <h2>Mark Attendance</h2>
+          <p>Record participant attendance for the competition</p>
+        </div>
+
+        <!-- Bulk Attendance Assignment Section -->
+        <div class="bulk-assignment-section attendance-bulk">
+          <div class="bulk-header">
+            <h3>⚡ Bulk Mark Attendance</h3>
+            <p>Mark all participants as present or absent at once</p>
+          </div>
+          <div class="bulk-form">
+            <select 
+              [(ngModel)]="bulkAttendanceValue"
+              class="select-attendance-status"
+              [disabled]="bulkAssigningAttendance">
+              <option [value]="null">Select Status</option>
+              <option value="present">Present</option>
+              <option value="absent">Absent</option>
+            </select>
+            <button 
+              class="btn-bulk-assign attendance-btn"
+              (click)="bulkAssignAttendance()"
+              [disabled]="bulkAssigningAttendance || !bulkAttendanceValue">
+              <span *ngIf="!bulkAssigningAttendance">Mark All</span>
+              <span *ngIf="bulkAssigningAttendance">Marking...</span>
+            </button>
+            <div class="bulk-info">
+              <span class="info-text">Will mark {{ filteredParticipants.length > 0 ? filteredParticipants.length : participants.length }} participant(s) as {{ bulkAttendanceValue }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="participants-list">
+          <div class="participant-item" *ngFor="let participant of filteredParticipants">
+            <div class="participant-info">
+              <div class="participant-name">{{ participant.participantname }}</div>
+              <div class="participant-details">
+                <span class="email">{{ participant.participantemail }}</span>
+                <span class="contact">{{ participant.contact_no }}</span>
+              </div>
+            </div>
+
+            <div class="section-action">
+              <div *ngIf="!editingAttendance[participant.competitionregid]" class="view-mode">
+                <span class="status" [class]="'status-' + (participant.attendance?.toLowerCase() || 'unmarked')">
+                  {{ participant.attendance || 'Not Marked' }}
+                </span>
+                <button 
+                  class="btn-edit"
+                  (click)="toggleEditAttendance(participant.competitionregid)"
+                  [disabled]="isResultPublished">
+                  ✏️ Mark
+                </button>
+              </div>
+              <div *ngIf="editingAttendance[participant.competitionregid]" class="edit-mode">
+                <select 
+                  [(ngModel)]="participant.attendance"
+                  class="select-field">
+                  <option value="">Select Status</option>
+                  <option value="present">Present</option>
+                  <option value="absent">Absent</option>
+                </select>
+                <button 
+                  class="btn-save"
+                  (click)="saveAttendance(participant)">
+                  Save
+                </button>
+                <button 
+                  class="btn-cancel"
+                  (click)="toggleEditAttendance(participant.competitionregid)">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="section" *ngIf="activeTab === 'result'">
+        <div class="section-title">
+          <h2>Add Results</h2>
+          <p>Record positions and awards for participants</p>
+        </div>
+
+        <div class="participants-list">
+          <div class="participant-item" *ngFor="let participant of filteredParticipants">
+            <div class="participant-info">
+              <div class="participant-name">{{ participant.participantname }}</div>
+              <div class="participant-details">
+                <span class="email">{{ participant.participantemail }}</span>
+                <span class="contact">{{ participant.contact_no }}</span>
+              </div>
+            </div>
+
+            <div class="section-action">
+              <div *ngIf="!editingResult[participant.competitionregid]" class="view-mode">
+                <span class="value" *ngIf="!participant.assignedPosition">-</span>
+                <span class="value result-badge" *ngIf="participant.assignedPosition">
+                  {{ formatPositionDisplay(participant.assignedPosition) }}
+                </span>
+                <button 
+                  class="btn-edit"
+                  (click)="toggleEditResult(participant.competitionregid)"
+                  [disabled]="isResultPublished">
+                  🏆 {{ participant.assignedPosition ? 'Edit' : 'Add' }}
+                </button>
+                <button 
+                  class="btn-delete"
+                  (click)="deleteResult(participant)"
+                  [disabled]="isResultPublished"
+                  *ngIf="participant.assignedPosition">
+                  🗑️ Remove
+                </button>
+              </div>
+              <div *ngIf="editingResult[participant.competitionregid]" class="edit-mode">
+                <select 
+                  [(ngModel)]="selectedResults[participant.competitionregid]"
+                  class="select-field">
+                  <option value="">Select Position</option>
+                  <option *ngFor="let position of getAvailablePositions(participant)" [value]="position.toString()">
+                    {{ position }}{{ getPositionSuffix(position) }} Position
+                  </option>
+                </select>
+                <button 
+                  class="btn-save"
+                  (click)="saveResult(participant)">
+                  Save
+                </button>
+                <button 
+                  class="btn-cancel"
+                  (click)="toggleEditResult(participant.competitionregid)">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

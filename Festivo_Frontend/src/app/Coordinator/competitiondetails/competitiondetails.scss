@@ -1,0 +1,270 @@
+// Theme
+$primary-blue: #0f3d8f;
+$secondary-blue: #2b73e0;
+$light-blue: #e6f0ff;
+$border-color: #e5e7eb;
+$text-dark: #1f2937;
+$text-light: #6b7280;
+
+.competitiondetails-container {
+	padding: 32px 40px 60px;
+	background: #f7f9fc;
+	min-height: 100vh;
+	color: $text-dark;
+}
+
+.btn-back {
+	border: 1px solid rgba($primary-blue, 0.25);
+	background: var(--color-surface);
+color: $primary-blue;
+	padding: 8px 14px;
+	border-radius: 20px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	margin-bottom: 20px;
+
+	&:hover {
+		background: $light-blue;
+		transform: translateY(-1px);
+	}
+}
+
+.loading-state {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: var(--color-surface);
+border-radius: 20px;
+	padding: 20px;
+	border: 1px solid $border-color;
+
+	.spinner {
+		width: 24px;
+		height: 24px;
+		border: 3px solid $light-blue;
+		border-top-color: $primary-blue;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+}
+
+.error-state {
+	background: #fef2f2;
+	border: 1px solid #ef4444;
+	color: #dc2626;
+	padding: 16px;
+	border-radius: 20px;
+}
+
+.details-card {
+	background: var(--color-surface);
+border-radius: 20px;
+	border: 1px solid $border-color;
+	/* shadow removed */
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: minmax(260px, 360px) 1fr;
+	margin-bottom: 28px;
+
+	@media (max-width: 900px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.registrations-card {
+	background: var(--color-surface);
+border-radius: 20px;
+	border: 1px solid $border-color;
+	/* shadow removed */
+	padding: 24px 28px;
+
+	.section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin-bottom: 16px;
+
+		h2 {
+			margin: 0;
+			font-size: 20px;
+			color: $text-dark;
+		}
+
+		.count {
+			background: $light-blue;
+			color: $primary-blue;
+			padding: 4px 10px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: 700;
+		}
+	}
+}
+
+.table-wrap {
+	overflow-x: auto;
+	border: 1px solid $border-color;
+	border-radius: 20px;
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		min-width: 760px;
+		background: var(--color-surface);
+th,
+		td {
+			padding: 12px 14px;
+			text-align: left;
+			border-bottom: 1px solid $border-color;
+			font-size: 13px;
+			color: $text-dark;
+		}
+
+		th {
+			background: #f1f5ff;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			font-weight: 700;
+			font-size: 11px;
+			color: $primary-blue;
+		}
+
+		tbody tr:hover {
+			background: #f9fbff;
+		}
+	}
+}
+
+.participant-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+
+	.name {
+		font-weight: 600;
+	}
+
+	.subtext {
+		font-size: 11px;
+		color: $text-light;
+	}
+}
+
+.empty-state {
+	padding: 20px;
+	background: #f9fafb;
+	border: 1px dashed $border-color;
+	border-radius: 20px;
+	color: $text-light;
+}
+
+.image-wrap {
+	position: relative;
+	min-height: 260px;
+	background: #f3f4f6;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.status {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		padding: 6px 12px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 700;
+		background: var(--color-surface);
+&.published {
+			background: #d1fae5;
+			color: #065f46;
+		}
+
+		&.pending {
+			background: #fef3c7;
+			color: #92400e;
+		}
+	}
+}
+
+.details-content {
+	padding: 28px 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	.header-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+
+		h1 {
+			margin: 0;
+			font-size: 24px;
+			color: $text-dark;
+		}
+
+		.type {
+			font-size: 12px;
+			font-weight: 700;
+			padding: 6px 12px;
+			border-radius: 20px;
+			text-transform: uppercase;
+			background: #e0e7ff;
+			color: #1e40af;
+
+			&.group {
+				background: #fce7f3;
+				color: #be185d;
+			}
+		}
+	}
+
+	.description {
+		margin: 0;
+		color: $text-light;
+		line-height: 1.6;
+		font-size: 14px;
+	}
+
+	.meta-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 16px;
+
+		.meta-item {
+			background: #f9fafb;
+			border: 1px solid $border-color;
+			border-radius: 20px;
+			padding: 12px 14px;
+
+			.label {
+				display: block;
+				font-size: 12px;
+				text-transform: uppercase;
+				color: $text-light;
+				font-weight: 600;
+				margin-bottom: 6px;
+			}
+
+			.value {
+				font-size: 14px;
+				color: $text-dark;
+				font-weight: 600;
+			}
+		}
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

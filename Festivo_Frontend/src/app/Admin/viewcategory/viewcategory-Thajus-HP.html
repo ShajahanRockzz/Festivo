@@ -1,0 +1,86 @@
+?<div class="page-container fade-in-up">
+  <!-- Modal for delete confirmation -->
+  <div class="modal-overlay glass-panel" *ngIf="showDeleteConfirm" (click)="onDeleteCancel()">
+    <div class="modal-content bento-card" (click)="$event.stopPropagation()">
+      <div class="delete-modal">
+        <div class="modal-icon warning-icon">⚠�?</div>
+        <h2 class="modal-title">Confirm Deletion</h2>
+        <p class="modal-message">Are you sure you want to delete <strong>{{ categoryToDelete?.category_name }}</strong>? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="onDeleteCancel()">CANCEL</button>
+          <button class="btn-delete neon-btn" (click)="onDeleteConfirm()">DELETE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error/Success Modal -->
+  <div class="modal-overlay glass-panel" *ngIf="showMessageModal" (click)="closeModal()">
+    <div class="modal-content bento-card" (click)="$event.stopPropagation()">
+      <div class="modal-message" [ngClass]="errorMessage ? 'error-modal' : 'success-modal'">
+        <div class="modal-icon">{{ errorMessage ? '✕' : '✓' }}</div>
+        <h2 class="modal-title">{{ errorMessage ? 'Error' : 'Success' }}</h2>
+        <p class="modal-text">{{ errorMessage || successMessage }}</p>
+        <button class="modal-btn neon-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>View Categories</h1>
+    <p class="subtitle">Manage all festival categories</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container glass-panel">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search categories by name or description..."
+      [(ngModel)]="searchQuery"
+      (input)="filterCategories()"
+    />
+    <span *ngIf="searchQuery" class="search-clear" (click)="clearSearch()">✕</span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading categories...</p>
+  </div>
+
+  <!-- Categories Cards -->
+  <div *ngIf="!isLoading" class="cards-container">
+    <div *ngIf="categories.length === 0" class="empty-state bento-card">
+      <p>No categories found. <a href="/adminmaster/addcategory" class="neon-text">Add a new category</a></p>
+    </div>
+
+    <div *ngIf="categories.length > 0 && filteredCategories.length === 0 && searchQuery" class="empty-state bento-card">
+      <p>No categories match your search for <strong>"{{ searchQuery }}"</strong></p>
+    </div>
+
+    <div *ngIf="filteredCategories.length > 0" class="grid-wrapper">
+      <div *ngFor="let category of filteredCategories" class="category-card bento-card">
+        <div class="card-image-container">
+          <img
+            [src]="'/uploads/' + (category.category_image || 'default_category.jpg')"
+            [alt]="category.category_name"
+            class="card-image"
+          />
+        </div>
+
+        <div class="card-content">
+          <h3 class="card-title">{{ category.category_name }}</h3>
+          <p class="card-description">{{ category.category_description }}</p>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-edit" (click)="onEditClick(category)" title="Edit category">EDIT</button>
+          <button class="btn-delete" (click)="onDeleteClick(category)" title="Delete category">DELETE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

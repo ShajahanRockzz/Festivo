@@ -1,0 +1,306 @@
+<div class="viewallusers-container">
+  <!-- Message Modal -->
+  <div *ngIf="showMessageModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div *ngIf="errorMessage" class="modal-message error-modal">
+        <div class="modal-icon">✕</div>
+        <h2 class="modal-title">Error</h2>
+        <p class="modal-text">{{ errorMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+
+      <div *ngIf="successMessage" class="modal-message success-modal">
+        <div class="modal-icon">✓</div>
+        <h2 class="modal-title">Success</h2>
+        <p class="modal-text">{{ successMessage }}</p>
+        <button class="modal-btn" (click)="closeModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div *ngIf="showConfirmModal" class="modal-overlay" (click)="closeConfirmModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-message warning-modal">
+        <div class="modal-icon">!</div>
+        <h2 class="modal-title">Confirm Action</h2>
+        <p class="modal-text" *ngIf="confirmAction === 'deactivate' && confirmEntityType === 'institution'">
+          Are you sure you want to deactivate this institution? All coordinators from this institution will also be deactivated.
+        </p>
+        <p class="modal-text" *ngIf="confirmAction === 'deactivate' && confirmEntityType !== 'institution'">
+          Are you sure you want to deactivate this {{ confirmEntityType }}?
+        </p>
+        <p class="modal-text" *ngIf="confirmAction === 'activate'">
+          Are you sure you want to activate this {{ confirmEntityType }}?
+        </p>
+        <div class="modal-actions">
+          <button class="btn-confirm" (click)="confirmStatusChange()">YES, CONFIRM</button>
+          <button class="btn-cancel" (click)="closeConfirmModal()">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading users...</p>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div *ngIf="!isLoading" class="page-header">
+    <h1>Manage Users</h1>
+    <p class="subtitle">View and manage all institutions, coordinators, and participants</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div *ngIf="!isLoading" class="tabs-container">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'institutions'"
+      (click)="switchTab('institutions')"
+    >
+      <span class="tab-icon">🏢</span>
+      Institutions <span class="tab-count">({{ filteredInstitutions.length }})</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'coordinators'"
+      (click)="switchTab('coordinators')"
+    >
+      <span class="tab-icon">👔</span>
+      Coordinators <span class="tab-count">({{ filteredCoordinators.length }})</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'participants'"
+      (click)="switchTab('participants')"
+    >
+      <span class="tab-icon">👤</span>
+      Participants <span class="tab-count">({{ filteredParticipants.length }})</span>
+    </button>
+  </div>
+
+  <!-- Institutions Tab -->
+  <div *ngIf="!isLoading && activeTab === 'institutions'" class="tab-content">
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search by institution name, email, or address..."
+          [(ngModel)]="institutionSearch"
+          (input)="filterInstitutions()"
+          class="search-input"
+        />
+        <button class="clear-btn" *ngIf="institutionSearch" (click)="clearInstitutionSearch()">✕</button>
+      </div>
+      <div class="filter-box">
+        <select [(ngModel)]="institutionStatusFilter" (change)="filterInstitutions()" class="filter-select">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Institutions Table -->
+    <div class="table-wrapper">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Institution Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let institution of filteredInstitutions" [class.inactive]="institution.status === 'inactive'">
+            <td class="institution-name">{{ institution.institution_name }}</td>
+            <td>{{ institution.institution_email }}</td>
+            <td>{{ institution.institution_contactno }}</td>
+            <td class="address">{{ institution.institution_address }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="institution.status === 'active'"
+                [class.status-inactive]="institution.status === 'inactive'"
+              >
+                {{ institution.status | uppercase }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="toggle-btn"
+                [class.toggle-active]="institution.status === 'active'"
+                [class.toggle-inactive]="institution.status === 'inactive'"
+                (click)="onInstitutionStatusToggle(institution)"
+                [title]="institution.status === 'active' ? 'Deactivate' : 'Activate'"
+              >
+                {{ institution.status === 'active' ? 'DEACTIVATE' : 'ACTIVATE' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Results -->
+      <div *ngIf="filteredInstitutions.length === 0" class="no-results">
+        <p>No institutions found matching your search criteria.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coordinators Tab -->
+  <div *ngIf="!isLoading && activeTab === 'coordinators'" class="tab-content">
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search by name, email, or institution..."
+          [(ngModel)]="coordinatorSearch"
+          (input)="filterCoordinators()"
+          class="search-input"
+        />
+        <button class="clear-btn" *ngIf="coordinatorSearch" (click)="clearCoordinatorSearch()">✕</button>
+      </div>
+      <div class="filter-box">
+        <select [(ngModel)]="coordinatorStatusFilter" (change)="filterCoordinators()" class="filter-select">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Coordinators Table -->
+    <div class="table-wrapper">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Institution</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let coordinator of filteredCoordinators" [class.inactive]="coordinator.status === 'inactive'">
+            <td class="coordinator-name">{{ coordinator.name }}</td>
+            <td>{{ coordinator.email }}</td>
+            <td>{{ coordinator.contact_no }}</td>
+            <td class="institution">{{ coordinator.institution_name }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="coordinator.status === 'active'"
+                [class.status-inactive]="coordinator.status === 'inactive'"
+              >
+                {{ coordinator.status | uppercase }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="toggle-btn"
+                [class.toggle-active]="coordinator.status === 'active'"
+                [class.toggle-inactive]="coordinator.status === 'inactive'"
+                (click)="onCoordinatorStatusToggle(coordinator)"
+                [title]="coordinator.status === 'active' ? 'Deactivate' : 'Activate'"
+              >
+                {{ coordinator.status === 'active' ? 'DEACTIVATE' : 'ACTIVATE' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Results -->
+      <div *ngIf="filteredCoordinators.length === 0" class="no-results">
+        <p>No coordinators found matching your search criteria.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Tab -->
+  <div *ngIf="!isLoading && activeTab === 'participants'" class="tab-content">
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search by name, email, or institution..."
+          [(ngModel)]="participantSearch"
+          (input)="filterParticipants()"
+          class="search-input"
+        />
+        <button class="clear-btn" *ngIf="participantSearch" (click)="clearParticipantSearch()">✕</button>
+      </div>
+      <div class="filter-box">
+        <select [(ngModel)]="participantStatusFilter" (change)="filterParticipants()" class="filter-select">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Participants Table -->
+    <div class="table-wrapper">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Institution</th>
+            <th>Academic Status</th>
+            <th>Account Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let participant of filteredParticipants" [class.inactive]="participant.status === 'inactive'">
+            <td class="participant-name">{{ participant.participantname }}</td>
+            <td>{{ participant.participantemail }}</td>
+            <td>{{ participant.contact_no }}</td>
+            <td class="institution">{{ participant.institution_name }}</td>
+            <td>{{ participant.academic_status }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="participant.status === 'active'"
+                [class.status-inactive]="participant.status === 'inactive'"
+              >
+                {{ participant.status | uppercase }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="toggle-btn"
+                [class.toggle-active]="participant.status === 'active'"
+                [class.toggle-inactive]="participant.status === 'inactive'"
+                (click)="onParticipantStatusToggle(participant)"
+                [title]="participant.status === 'active' ? 'Deactivate' : 'Activate'"
+              >
+                {{ participant.status === 'active' ? 'DEACTIVATE' : 'ACTIVATE' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Results -->
+      <div *ngIf="filteredParticipants.length === 0" class="no-results">
+        <p>No participants found matching your search criteria.</p>
+      </div>
+    </div>
+  </div>
+</div>

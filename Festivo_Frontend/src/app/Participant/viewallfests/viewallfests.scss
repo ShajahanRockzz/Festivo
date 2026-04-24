@@ -1,0 +1,430 @@
+.festivals-section {
+  padding: 80px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: #fff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  /* Dark-to-Midnight subtle gradient */
+  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+}
+
+.relative-z {
+  position: relative;
+  z-index: 2;
+}
+
+/* Typography */
+.premium-title {
+  font-size: 2.8rem;
+  font-weight: 800; // Boosted heading weight
+  margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.premium-subtitle {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 600px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.header-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 24px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  
+  span:first-child {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #38bdf8;
+    line-height: 1;
+  }
+  .badge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+}
+
+/* Centralized Polished Search Container */
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Center everything
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px; // Restricted width
+  background: rgba(30, 41, 59, 0.7); // Glassmorphism dark
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 16px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* slight border */
+  /* shadow removed */
+  transition: all 0.3s ease;
+  
+  &:focus-within {
+    border-color: rgba(56, 189, 248, 0.5);
+    background: rgba(15, 23, 42, 0.9);
+    /* shadow removed */
+  }
+  
+  .search-icon {
+    color: #94a3b8;
+    margin-right: 14px;
+    font-size: 1.2rem;
+  }
+  
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.05rem;
+    outline: none;
+    
+    &::placeholder {
+      color: #64748b;
+    }
+  }
+}
+
+.festival-dock-filters {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  
+  .filter-btn {
+    position: relative;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    
+    &.active {
+      color: #fff;
+      background: rgba(15, 23, 42, 0.8);
+      
+      /* Electric Blue Glow for Active State */
+      .glow-indicator {
+        position: absolute;
+        bottom: -2px;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        background: #38bdf8;
+        border-radius: 20px;
+        /* shadow removed */
+      }
+    }
+  }
+}
+
+/* Strict Auto-Fit Grid System */
+.festivals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 350px); /* Strict 350px width columns */
+  justify-content: center; /* Center the grid */
+  gap: 2rem;
+}
+
+/* Premium Floating Card */
+.floating-card {
+  position: relative;
+  display: flex;       /* flex layout for the card */
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.6); // Deep slate background
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px; /* slightly sharper corners matching the image standard */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  
+  /* 1px Border Glow Gradient */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 10;
+  }
+  
+  /* Lift up & shadow bounce */
+  &:hover {
+    transform: translateY(-8px);
+    /* shadow removed */
+  }
+}
+
+/* Staggered Animation */
+.fest-card {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation-delay: calc(var(--animation-order) * 0.1s);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card Image - Fixed Height & Radius */
+.fest-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Fixed height for image */
+  overflow: hidden;
+  border-radius: 20px 16px 0 0; /* rounded top edges, flush bottom */
+  
+  .fest-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+  
+  .image-mask {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  
+  .fest-category {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #e2e8f0;
+  }
+}
+
+.fest-card:hover .fest-image {
+  transform: scale(1.05);
+}
+
+/* Card Content Area */
+.fest-info {
+  padding: 1.5rem; /* Strict padding requested */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.fest-title {
+  font-size: 1.4rem;
+  font-weight: 800; // Boosted heading weight
+  margin: 0 0 10px 0;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.fest-description {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Inner 2-column Details Grid */
+.bento-details {
+  display: grid;
+  grid-template-columns: 100px 1fr; /* Exact grid-spacing */
+  row-gap: 0.5rem;
+  column-gap: 0.5rem;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+
+.detail-item {
+  display: contents; /* Allows children to participate directly in the bento-details grid */
+  
+  .meta-label {
+    font-size: 0.7rem;          /* Tiny labels */
+    font-weight: 700;
+    color: #64748b;             /* Slate */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .meta-value {
+    font-size: 0.9rem;          /* Popping crisp text */
+    font-weight: 500;           
+    color: #f8fafc;             /* White pop */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Glowing Ghost Button */
+.btn-ghost-glow {
+  margin-top: auto; /* pushes button to the bottom if content expands */
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    color: #fff;
+    border-color: transparent;
+    /* shadow removed */
+    transform: translateY(-2px);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* Coming Soon Empty State Card */
+.coming-soon-card {
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.3); // Even lighter transparent background
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  
+  &::before {
+    display: none; // Remove solid glow border
+  }
+  
+  &:hover {
+    transform: translateY(0); // Disable hover lift
+    /* shadow removed */
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .coming-soon-content {
+    .sparkle-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    
+    .coming-soon-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      color: #64748b;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
+}
+
+/* States */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 60px 24px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .search-field {
+    width: 100%;
+    max-width: 100%; /* unlock width on phone */
+  }
+  
+  .festivals-grid {
+     grid-template-columns: 1fr; /* stack vertically on mobile */
+  }
+}

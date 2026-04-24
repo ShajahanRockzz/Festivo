@@ -1,0 +1,70 @@
+<div class="report-container">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1>Student Participation Report</h1>
+      <p>Overview of student registrations across Fests and individual Competitions</p>
+    </div>
+    <div class="export-actions">
+      <button class="btn-export pdf" (click)="exportToPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+    </div>
+  </div>
+  
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>Participation per Fest</h3>
+      <div class="chart-wrapper bar">
+        <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="barChartType"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Participation per Competition (Top 10)</h3>
+      <div class="chart-wrapper pie">
+        <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="pieChartType"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-table-container mt-4">
+    <h3>Fest Participation Breakdown</h3>
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Fest Name</th>
+            <th style="text-align: right">Total Students Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of festData">
+            <td><strong>{{ item.fest_name }}</strong></td>
+            <td style="text-align: right; color: #4f46e5; font-weight: bold;">{{ item.participant_count }}</td>
+          </tr>
+          <tr *ngIf="festData.length === 0"><td colspan="2" class="text-center">No fests found</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="history-table-container mt-4">
+    <h3>Detailed Competition Breakdown</h3>
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Fest Name</th>
+            <th>Competition Name</th>
+            <th style="text-align: right">Students Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of competitionData">
+            <td>{{ item.fest_name }}</td>
+            <td><strong>{{ item.competition_name }}</strong></td>
+            <td style="text-align: right; color: #10b981; font-weight: bold;">{{ item.participant_count }}</td>
+          </tr>
+          <tr *ngIf="competitionData.length === 0"><td colspan="3" class="text-center">No competitions found</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

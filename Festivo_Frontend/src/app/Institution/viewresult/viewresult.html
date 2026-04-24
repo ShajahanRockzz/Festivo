@@ -1,0 +1,102 @@
+﻿<div class="viewresult-container">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Back to Festivals</button>
+    <h1>📊 View Results for {{ festName }}</h1>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading competitions...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-message">
+    {{ error }}
+    <button (click)="goBack()" class="btn-retry">Go Back</button>
+  </div>
+
+  <!-- Page Content -->
+  <div *ngIf="!loading && competitions.length > 0" class="results-container">
+    
+    <!-- Filters & Search -->
+    <div class="filters-container">
+      <div class="search-box">
+        <label for="search-comp">Search Competition:</label>
+        <input id="search-comp" type="text" [(ngModel)]="searchQuery" placeholder="Type to search..." class="competition-input">
+      </div>
+      <div class="filter-box">
+        <label for="status-filter">Result Status:</label>
+        <select id="status-filter" [(ngModel)]="statusFilter" class="competition-select">
+          <option value="all">All Statuses</option>
+          <option value="published">Published</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Competition Selector -->
+    <div class="competition-selector">
+      <label for="competition-select">Select Competition:</label>
+      <select
+        id="competition-select"
+        (change)="onCompetitionSelected($event)"
+        class="competition-select"
+      >
+        <option value="">-- Choose a Competition --</option>
+        <option *ngFor="let comp of filteredCompetitions" [value]="comp.competition_id">
+          {{ comp.competition_name }} ({{ comp.type | titlecase }}) - [{{ comp.res_status | titlecase }}]
+        </option>
+      </select>
+    </div>
+
+    <!-- Results Display -->
+    <div *ngIf="selectedCompetition" class="results-display">
+      <div class="competition-info">
+        <h2>{{ selectedCompetition.competition_name }}</h2>
+        <p>
+          <strong>Type:</strong> {{ selectedCompetition.type | titlecase }} |
+          <strong>Date:</strong> {{ selectedCompetition.competition_date | date: 'MMM dd, yyyy' }} |
+          <strong>Status:</strong> <span [class.status-published]="selectedCompetition.res_status === 'published'" [class.status-pending]="selectedCompetition.res_status === 'pending'">{{ selectedCompetition.res_status | titlecase }}</span>
+        </p>
+      </div>
+
+      <div *ngIf="results.length === 0" class="no-results">
+        <p>No results recorded for this competition yet.</p>
+      </div>
+
+      <div *ngIf="results.length > 0" class="results-table-container">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Winner/Team</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let result of results" [ngClass]="'position-' + result.position">
+              <td>
+                <span *ngIf="result.position === '1'">🥇 1st Place</span>
+                <span *ngIf="result.position === '2'">🥈 2nd Place</span>
+                <span *ngIf="result.position === '3'">🥉 3rd Place</span>
+              </td>
+              <td>{{ result.participantname }}</td>
+              <td>{{ result.participantemail || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="!selectedCompetition" class="empty-selection">
+      <p>Select a competition to view results</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && competitions.length === 0" class="empty-state">
+    <p>No competitions found for this festival.</p>
+    <button (click)="goBack()" class="btn-back-action">Go Back</button>
+  </div>
+</div>

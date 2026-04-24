@@ -1,0 +1,16 @@
+      return Array.from(new Set(values))
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => value.toLowerCase());
+    }
+  
+>   getFestImage(imagePath: string | undefined): string {
+      if (!imagePath) {
+        return 'assets/default-fest.jpg';
+      }
+      // Check if path is already full URL
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      // Prefix with backend URL
+      return `http://localhost:3000${imagePath}`;
+    }

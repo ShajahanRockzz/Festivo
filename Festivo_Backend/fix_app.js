@@ -1,0 +1,1 @@
+const fs=require('fs'); let c=fs.readFileSync('app.js','utf8'); c = c.replace('module.exports = app;', 'var revenueRouter = require(\'./routes/revenue\');\napp.use(\'/revenue\', revenueRouter);\nmodule.exports = app;'); fs.writeFileSync('app.js', c);

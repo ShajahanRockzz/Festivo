@@ -1,0 +1,102 @@
+<div class="editresult-container fade-in-up">
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div [ngClass]="'modal-message ' + (modalData.type === 'error' ? 'error-modal' : 'success-modal')">
+        <div class="modal-icon">{{ modalData.type === 'error' ? '❌' : '✓' }}</div>
+        <h2 class="modal-title">{{ modalData.title }}</h2>
+        <p class="modal-text">{{ modalData.message }}</p>
+        <div class="modal-actions">
+          <button class="modal-btn neon-btn" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn neon-btn" (click)="goBack()">← Back</button>
+    <h1>🏆 Edit Competition Results</h1>
+    <p class="subtitle" *ngIf="competitionName">for {{ competitionName }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container fade-in-up">
+    <div class="spinner"></div>
+    <p>Loading participants...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-banner">
+    <span class="error-icon">⚠️</span>
+    <span class="error-text">{{ error }}</span>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading" class="content-container fade-in-up">
+    <!-- Empty State -->
+    <div *ngIf="participants.length === 0" class="empty-state">
+      <p>No participants registered for this competition.</p>
+    </div>
+
+    <!-- Participants Table -->
+    <div *ngIf="participants.length > 0" class="results-section">
+      <div class="section-header">
+        <h2>Manage Results</h2>
+        <p class="helper-text">Enter positions for winners (1st, 2nd, 3rd, etc.). Leave blank if no position.</p>
+      </div>
+
+      <div class="table-wrapper grid-wrapper">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Participant Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Position</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let participant of participants" class="participant-row">
+              <td>{{ participant.participantname }}</td>
+              <td>{{ participant.participantemail }}</td>
+              <td>{{ participant.contact_no }}</td>
+              <td>
+                <input 
+                  type="number" 
+                  [(ngModel)]="participant.position" 
+                  [ngModelOptions]="{updateOn: 'blur'}"
+                  placeholder="e.g., 1, 2, 3"
+                  class="position-input"
+                  min="1"
+                />
+              </td>
+              <td>
+                <span *ngIf="participant.position" class="status-badge awarded">
+                  ✓ Position {{ participant.position }}
+                </span>
+                <span *ngIf="!participant.position" class="status-badge not-awarded">
+                  No Position
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel neon-btn" (click)="goBack()">Cancel</button>
+        <button 
+          type="button" 
+          class="btn-submit neon-btn"
+          (click)="saveResults()"
+          [disabled]="saving || participants.length === 0"
+        >
+          {{ saving ? '💾 Saving...' : '💾 Save Results' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

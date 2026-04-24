@@ -1,0 +1,75 @@
+<!-- Header -->
+<header class="admin-header">
+  <div class="header-container">
+    <div class="header-left">
+      <h1 class="logo">🎉 Festivo Admin</h1>
+    </div>
+    <div class="header-right">
+      <div class="user-menu-container">
+        <button class="user-profile-btn" (click)="toggleUserProfile()">
+          <span class="user-icon">👤</span>
+          <span class="user-name">{{ adminName }}</span>
+          <span class="dropdown-icon">▼</span>
+        </button>
+        <div *ngIf="userProfileOpen" class="user-dropdown">
+          <div class="dropdown-item">
+            <span class="item-icon">👤</span>
+            <span>Profile</span>
+          </div>
+          <div class="dropdown-item">
+            <span class="item-icon">⚙️</span>
+            <span>Settings</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item logout" (click)="logout()">
+            <span class="item-icon">🚪</span>
+            <span>Logout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="admin-wrapper">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" [class.open]="sidebarOpen">
+    <nav class="sidebar-nav">
+      <ul class="menu-list">
+        <li *ngFor="let item of menuItems" class="menu-item">
+          <button 
+            class="menu-button" 
+            (click)="toggleMenu(item)"
+            [class.expanded]="item.expanded">
+            <span class="menu-icon">{{ item.icon }}</span>
+            <span class="menu-label">{{ item.label }}</span>
+            <span class="menu-arrow" *ngIf="item.submenu">▶</span>
+          </button>
+          
+          <ul class="submenu" *ngIf="item.submenu && item.expanded">
+            <li *ngFor="let subitem of item.submenu" class="submenu-item">
+              <a [routerLink]="subitem.route" class="submenu-link">
+                <span class="submenu-icon">{{ subitem.icon }}</span>
+                <span class="submenu-label">{{ subitem.label }}</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="admin-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Festivo Admin Panel. All Rights Reserved.</p>
+  </div>
+</footer>
+
+

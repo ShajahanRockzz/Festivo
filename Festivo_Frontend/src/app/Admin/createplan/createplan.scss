@@ -1,0 +1,567 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+// Color Variables
+$primary-blue: #0052a3;
+$secondary-blue: #2979f0;
+$tertiary-blue: #4a90e2;
+$light-blue: #e3f2fd;
+$dark-color: #1a2332;
+$light-color: #f8f9fa;
+$white: #ffffff;
+$text-color: #4a5568;
+$text-light: #718096;
+$border-color: #e2e8f0;
+$success-color: #10b981;
+$error-color: #ef4444;
+$shadow: 0 4px 20px rgba(0, 82, 163, 0.1);
+$shadow-lg: 0 12px 40px rgba(0, 82, 163, 0.15);
+
+* {
+  box-sizing: border-box;
+}
+
+.create-plan-container {
+  padding: 40px;
+  background-color: $light-color;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+}
+
+// Modal Overlay
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Modal Content
+.modal-content {
+  position: relative;
+  animation: slideUp 0.3s ease;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-message {
+  background-color: $white;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  /* shadow removed */
+  text-align: center;
+  border-left: 6px solid;
+
+  .modal-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+  }
+
+  .modal-text {
+    color: $text-color;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 25px 0;
+  }
+
+  .modal-btn {
+    background-color: $primary-blue;
+    color: $white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      transform: translateY(-2px);
+      /* shadow removed */
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.error-modal {
+    border-left-color: $error-color;
+
+    .modal-title {
+      color: $error-color;
+    }
+
+    .modal-btn {
+      background-color: $error-color;
+
+      &:hover {
+        /* shadow removed */
+      }
+    }
+  }
+
+  &.success-modal {
+    border-left-color: $success-color;
+
+    .modal-title {
+      color: $success-color;
+    }
+
+    .modal-btn {
+      background-color: $success-color;
+
+      &:hover {
+        /* shadow removed */
+      }
+    }
+  }
+}
+
+// Page Header
+.page-header {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .back-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    color: $primary-blue;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      transform: translateX(-4px);
+      color: $dark-color;
+    }
+  }
+
+  .header-content {
+    flex: 1;
+
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      color: $dark-color;
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
+    }
+
+    .subtitle {
+      color: $text-light;
+      font-size: 16px;
+      margin: 0;
+      font-weight: 400;
+    }
+  }
+}
+
+// Form Wrapper
+.form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Form Card
+.form-card {
+  background-color: $white;
+  border-radius: 20px;
+  padding: 40px;
+  /* shadow removed */
+
+  @media (max-width: 768px) {
+    padding: 25px;
+  }
+}
+
+// Form Group
+.form-group {
+  margin-bottom: 30px;
+
+  &:last-of-type {
+    margin-bottom: 40px;
+  }
+}
+
+// Form Label
+.form-label {
+  display: block;
+  color: $dark-color;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-family: 'Poppins', sans-serif;
+
+  .required {
+    color: $error-color;
+    margin-left: 4px;
+    font-weight: bold;
+  }
+}
+
+// Form Input & Select
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid $border-color;
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: $text-color;
+  transition: all 0.3s ease;
+  background-color: $white;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-blue;
+    /* shadow removed */
+  }
+
+  &::placeholder {
+    color: $text-light;
+  }
+
+  &:disabled {
+    background-color: $light-color;
+    cursor: not-allowed;
+    color: $text-light;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+// Form Helper Text
+.form-helper {
+  display: block;
+  color: $text-light;
+  font-size: 12px;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+// Buttons
+.btn-primary,
+.btn-secondary {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.btn-primary {
+  background-color: $primary-blue;
+  color: $white;
+  /* shadow removed */
+
+  &:hover:not(:disabled) {
+    background-color: darken($primary-blue, 5%);
+    transform: translateY(-2px);
+    /* shadow removed */
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: $text-light;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.btn-secondary {
+  background-color: $light-blue;
+  color: $primary-blue;
+  border: 2px solid $primary-blue;
+
+  &:hover {
+    background-color: $secondary-blue;
+    color: $white;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Info Box
+.info-box {
+  background-color: $light-blue;
+  border-radius: 20px;
+  padding: 25px;
+  /* shadow removed */
+  margin-top: 40px;
+
+  h3 {
+    font-family: 'Poppins', sans-serif;
+    color: $primary-blue;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+  }
+}
+
+// Info List
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    color: $text-color;
+    font-size: 13px;
+    margin-bottom: 12px;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.6;
+    font-weight: 500;
+
+    &:before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: $success-color;
+      font-weight: bold;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Preview Card
+.preview-card {
+  background-color: $white;
+  border-radius: 20px;
+  padding: 30px;
+  /* shadow removed */
+  height: fit-content;
+
+  h3 {
+    font-family: 'Poppins', sans-serif;
+    color: $dark-color;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid $border-color;
+  }
+
+  @media (max-width: 1024px) {
+    margin-top: 20px;
+  }
+}
+
+// Plan Name Preview
+.plan-name-preview {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: $primary-blue;
+  margin-bottom: 15px;
+  line-height: 1.2;
+
+  &.empty {
+    color: $text-light;
+  }
+}
+
+// Plan Price
+.plan-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: $success-color;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+
+  .price-duration {
+    font-size: 14px;
+    color: $text-light;
+    font-weight: 500;
+    margin-left: auto;
+  }
+}
+
+// Plan Description
+.plan-description {
+  color: $text-color;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: $light-blue;
+  border-radius: 20px;
+  border-left: 4px solid $primary-blue;
+
+  &.empty {
+    color: $text-light;
+    font-style: italic;
+  }
+}
+
+// Plan Features
+.plan-features {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(16, 185, 129, 0.05);
+  border-radius: 20px;
+
+  h4 {
+    font-family: 'Poppins', sans-serif;
+    color: $dark-color;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      color: $text-color;
+      font-size: 13px;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+      font-weight: 500;
+
+      &:before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: $success-color;
+        font-weight: bold;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Plan Info
+.plan-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: $light-blue;
+  border-radius: 20px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-label {
+    color: $text-color;
+    font-weight: 600;
+  }
+
+  .info-value {
+    color: $primary-blue;
+    font-weight: 700;
+    font-size: 16px;
+  }
+}

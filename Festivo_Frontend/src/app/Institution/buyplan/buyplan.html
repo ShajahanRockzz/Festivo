@@ -1,0 +1,213 @@
+<div class="buyplan-container">
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div [ngClass]="'modal-message ' + (modalData.type === 'error' ? 'error-modal' : 'success-modal')">
+        <div class="modal-icon">{{ modalData.type === 'error' ? '❌' : '✓' }}</div>
+        <h2 class="modal-title">{{ modalData.title }}</h2>
+        <p class="modal-text">{{ modalData.message }}</p>
+        <button class="modal-btn" (click)="closeModal()">{{ modalData.type === 'success' ? 'Continue' : 'Close' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div *ngIf="showPaymentModal" class="payment-modal-overlay" (click)="closePaymentModal()">
+    <div class="payment-modal-content" (click)="$event.stopPropagation()">
+      <div class="payment-modal-header">
+        <h2>Complete Payment</h2>
+        <button class="close-btn" (click)="closePaymentModal()">✕</button>
+      </div>
+
+      <div class="payment-modal-body">
+        <div class="plan-summary">
+          <div class="summary-row">
+            <span class="label">Plan Name:</span>
+            <span class="value">{{ getSelectedPlanName() }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Duration:</span>
+            <span class="value">{{ getSelectedPlanDays() }} days</span>
+          </div>
+          <div class="summary-row total">
+            <span class="label">Total Amount:</span>
+            <span class="value">₹{{ getSelectedPlanAmount() }}</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="processPayment()">
+          <!-- Cardholder Name -->
+          <div class="form-group">
+            <label for="cardholderName" class="form-label">Cardholder Name <span class="required">*</span></label>
+            <input
+              type="text"
+              id="cardholderName"
+              class="form-input"
+              [class.input-error]="paymentErrors['cardHolderName']"
+              placeholder="Enter full name"
+              [(ngModel)]="paymentData.cardHolderName"
+              name="cardholderName"
+              (keydown)="allowOnlyLetters($event)"
+              (input)="formatCardholderName($event); validateCardHolderName()"
+              (blur)="validateCardHolderName()"
+            />
+            <small *ngIf="paymentErrors['cardHolderName']" class="field-error">{{ paymentErrors['cardHolderName'] }}</small>
+          </div>
+
+          <!-- Card Number -->
+          <div class="form-group">
+            <label for="cardNumber" class="form-label">Card Number <span class="required">*</span></label>
+            <input
+              type="text"
+              id="cardNumber"
+              class="form-input"
+              [class.input-error]="paymentErrors['cardNumber']"
+              placeholder="1234 5678 9012 3456"
+              [(ngModel)]="paymentData.cardNumber"
+              name="cardNumber"
+              maxlength="23"
+              inputmode="numeric"
+              (keydown)="allowOnlyDigits($event)"
+              (input)="formatCardNumber($event); validateCardNumber()"
+              (blur)="validateCardNumber()"
+            />
+            <small *ngIf="paymentErrors['cardNumber']" class="field-error">{{ paymentErrors['cardNumber'] }}</small>
+          </div>
+
+          <!-- Expiry Date and CVV -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiryDate" class="form-label">Expiry Date <span class="required">*</span></label>
+              <input
+                type="text"
+                id="expiryDate"
+                class="form-input"
+                [class.input-error]="paymentErrors['expiryDate']"
+                placeholder="MM/YY"
+                [(ngModel)]="paymentData.expiryDate"
+                name="expiryDate"
+                maxlength="5"
+                inputmode="numeric"
+                (keydown)="allowOnlyDigits($event)"
+                (input)="formatExpiryDate($event); validateExpiryDate()"
+                (blur)="validateExpiryDate()"
+              />
+              <small *ngIf="paymentErrors['expiryDate']" class="field-error">{{ paymentErrors['expiryDate'] }}</small>
+            </div>
+
+            <div class="form-group">
+              <label for="cvv" class="form-label">CVV <span class="required">*</span></label>
+              <input
+                type="text"
+                id="cvv"
+                class="form-input"
+                [class.input-error]="paymentErrors['cvv']"
+                placeholder="123"
+                [(ngModel)]="paymentData.cvv"
+                name="cvv"
+                maxlength="4"
+                inputmode="numeric"
+                (keydown)="allowOnlyDigits($event)"
+                (input)="formatCvv($event); validateCvv()"
+                (blur)="validateCvv()"
+              />
+              <small *ngIf="paymentErrors['cvv']" class="field-error">{{ paymentErrors['cvv'] }}</small>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="closePaymentModal()">Cancel</button>
+            <button 
+              type="submit" 
+              class="btn-primary"
+              [disabled]="isLoading"
+            >
+              <span *ngIf="!isLoading">Pay Now</span>
+              <span *ngIf="isLoading">Processing...</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="security-info">
+          <span class="lock-icon">🔒</span>
+          <p>Your payment information is secure and encrypted</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>{{ currentPlan ? "Upgrade Your Plan" : "Choose Your Plan" }}</h1>
+    <p class="subtitle">{{ currentPlan ? "You are currently subscribed. Select a higher plan to upgrade." : "Select a plan to publish your festivals and manage competitions" }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && plans.length === 0" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading plans...</p>
+  </div>
+
+    <!-- Current Plan Section -->
+    <!-- Current Plan Section -->
+  <div class="current-plan-section" *ngIf="currentPlan">
+    <h2>Your Current Plan</h2>
+    <div class="current-plan-card">
+      <div class="plan-header-info">
+        <div class="title-badge-group">
+          <h3 class="plan-title">{{ currentPlan.plan_name }}</h3>
+          <span class="badge-current">Current</span>
+        </div>
+        <div class="plan-details-list">
+          <p><strong>Duration:</strong> {{ currentPlan.days }} days</p>
+          <p><strong>Price:</strong> ₹{{ currentPlan.amount }}</p>
+          <p><strong>Renewal Date:</strong> {{ formatRenewalDate(currentPlan.renewaldate) }}</p>
+          <p class="plan-desc">{{ currentPlan.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plans Grid -->
+  <div *ngIf="!isLoading && plans.length > 0" class="plans-grid">
+    <div *ngFor="let plan of plans" class="plan-card">
+      <div class="plan-header">
+        <h3 class="plan-name">{{ plan.plan_name }}</h3>
+        <div class="plan-duration">{{ plan.days }} Days</div>
+      </div>
+
+      <div class="plan-price">
+        <span class="currency">₹</span>
+        <span class="amount">{{ plan.amount }}</span>
+      </div>
+
+      <div class="plan-description">
+        {{ plan.description }}
+      </div>
+
+      <ul class="plan-features">
+        <li>✓ Create up to 10 festivals</li>
+        <li>✓ Manage competitions</li>
+        <li>✓ Track registrations</li>
+        <li>✓ Email support</li>
+        <li *ngIf="plan.days >= 150">✓ Priority support</li>
+        <li *ngIf="plan.days >= 365">✓ Dedicated account manager</li>
+      </ul>
+
+      <button 
+        class="btn-select-plan"
+        (click)="selectPlan(plan.plan_id)"
+      >
+        Select Plan
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && plans.length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h2>No Plans Available</h2>
+    <p>{{ currentPlan ? "You already have the highest plan! Enjoy your premium features." : "Currently, there are no plans available. Please try again later." }}</p>
+  </div>
+</div>

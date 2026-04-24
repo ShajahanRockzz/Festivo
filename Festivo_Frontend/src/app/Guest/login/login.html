@@ -1,0 +1,128 @@
+
+<!-- Full Screen Loading Overlay -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="spinner-container fade-in-up">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring delay"></div>
+    <div class="logo-spinner">F</div>
+  </div>
+  <p class="loading-text">Authenticating...</p>
+</div>
+
+<!-- Failed Login Toast -->
+<div class="toast-error" [class.show]="errorMessage">
+  <span class="toast-icon">⚠️</span>
+  <div>
+    <h4>Authentication Failed</h4>
+    <p>{{ errorMessage }}</p>
+  </div>
+  <button class="toast-close" (click)="errorMessage = ''">&times;</button>
+</div>
+
+<!-- Success State Transition -->
+<div class="login-container fade-in-up" [class.fade-out]="isSuccess">
+  <!-- Back Button -->
+  <div class="back-button-container fade-in-up">
+    <button class="back-btn neon-btn" (click)="goBack()" title="Go back">
+      <span class="back-arrow">←</span>
+      <span class="back-text">Back</span>
+    </button>
+  </div>
+
+  <div class="login-wrapper grid-wrapper">
+    <!-- Login Header with slide-right animation -->
+    <div class="login-header animated-header">
+      <div class="logo-section">
+        <h1 class="app-title">Festivo</h1>
+        <p class="tagline">Festival & Event Management<br>Platform</p>
+      </div>
+    </div>
+
+    <!-- Glassmorphism Card -->
+    <div class="login-content-wrapper grid-wrapper">
+      <div class="login-content login-card bento-card">
+        <h2>Sign In</h2>
+        <p class="login-subtitle">Login to your account to access the platform</p>
+
+        <!-- Login Form -->
+        <form (ngSubmit)="submitLogin()" #loginForm="ngForm">
+          
+          <!-- Floating Label Username Field -->
+          <div class="form-group floating-group">
+            <input
+              type="text"
+              id="username"
+              [(ngModel)]="loginData.username"
+              name="username"
+              placeholder=" "
+              [disabled]="isLoading"
+              required
+              class="floating-input"
+            />
+            <label for="username" class="floating-label">Username</label>
+            <div class="glow-border"></div>
+          </div>
+
+          <!-- Floating Label Password Field -->
+          <div class="form-group floating-group">
+            <div class="password-input-wrapper grid-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                [(ngModel)]="loginData.password"
+                name="password"
+                placeholder=" "
+                [disabled]="isLoading"
+                required
+                class="floating-input"
+              />
+              <label for="password" class="floating-label">Password</label>
+              <div class="glow-border"></div>
+              
+              <button
+                type="button"
+                class="btn-toggle-password neon-btn"
+                (click)="togglePasswordVisibility()"
+                [disabled]="isLoading"
+                tabindex="-1"
+              >
+                {{ showPassword ? '👁️' : '🙈' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn-login neon-btn"
+            [disabled]="isLoading || !loginForm.valid"
+          >
+            <span>Sign In</span>
+          </button>
+        </form>
+
+        <!-- Additional Links -->
+        <div class="login-footer">
+          <p class="signup-text">
+            Don't have an account?
+            <a (click)="openRegisterModal()" class="signup-link">Sign up here</a> 
+          </p>
+          <p class="forgot-password">
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="login-info animated-footer">
+        <p>Select your role during registration to access the appropriate dashboard:</p>
+      <div class="role-badges">
+          <span class="badge badge-admin">👨‍💼 Admin</span>
+          <span class="badge badge-institution">🏛️ Institution</span>
+          <span class="badge badge-participant">👤 Participant</span>
+          <span class="badge badge-coordinator">📋 Coordinator</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

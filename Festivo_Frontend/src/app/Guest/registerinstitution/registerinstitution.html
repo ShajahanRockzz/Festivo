@@ -1,0 +1,332 @@
+<div class="about-page registration-container fade-in-up" style="padding-top: 60px; min-height: 100vh;">
+  <div class="container fade-in-up" style="max-width: 800px; margin: 0 auto; padding: 0 20px;">
+    <div class="about-hero text-center" style="margin-bottom: 40px;">
+      <div style="display:inline-block; padding: 6px 16px; background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 50px; color: #a78bfa; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 20px;">INSTITUTION REGISTRATION</div>
+      <h1 style="font-size: 3rem; margin-bottom: 10px; color: #fff;">Host Your <span style="background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); -webkit-text-fill-color: transparent; background-clip: text; -webkit-background-clip: text;">Festivo</span> Events</h1>
+      <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Register your institution and host amazing festivals and events seamlessly.</p>
+    </div>
+
+    <div class="registration-content">
+      <form (ngSubmit)="submitRegistration()" #registrationForm="ngForm">
+  <!-- Global Messages -->
+  <div *ngIf="errorMessage" class="alert alert-error" style="margin-bottom: 20px; padding: 15px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; color: #ef4444; font-weight: 500; text-align: center;">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success" style="margin-bottom: 20px; padding: 15px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; color: #10b981; font-weight: 500; text-align: center;">
+    {{ successMessage }}
+  </div>
+        <!-- Institution Information Section -->
+        <div class="form-section glass-card bento-card" style="margin-bottom: 30px;">
+          <h2 class="section-title">Institution Information</h2>
+
+          <div class="form-group">
+            <label for="institution_name">Institution Name *</label>
+            <input
+              type="text"
+              id="institution_name"
+              [(ngModel)]="institutionForm.institution_name"
+              name="institution_name"
+              placeholder="Enter your institution name"
+              required
+            />
+            <div *ngIf="institutionForm.institution_name === '' && institutionForm.institution_name !== undefined" class="field-error">Please enter your institution name</div>
+          </div>
+
+          <div class="form-group">
+            <label for="institution_address">Address *</label>
+            <textarea
+              id="institution_address"
+              [(ngModel)]="institutionForm.institution_address"
+              name="institution_address"
+              placeholder="Enter your institution address"
+              rows="3"
+              required
+            ></textarea>
+            <div *ngIf="institutionForm.institution_address === '' && institutionForm.institution_address !== undefined" class="field-error">Please enter your address</div>
+          </div>
+
+          <div class="form-group">
+            <label for="institution_email">Email Address *</label>
+            <div class="email-input-group">
+              <input
+                type="email"
+                id="institution_email"
+                [(ngModel)]="institutionForm.institution_email"
+                name="institution_email"
+                placeholder="Enter your institution email"
+                [disabled]="otpVerified"
+                (change)="checkEmailAvailability()"
+                required
+              />
+              <button
+                *ngIf="!otpVerified"
+                type="button"
+                class="btn-send-otp neon-btn"
+                (click)="requestOTP()"
+                [disabled]="otpLoading || otpSent || emailError !== ''"
+              >
+                {{ otpLoading ? 'Sending...' : otpSent ? 'OTP Sent' : 'Send OTP' }}
+              </button>
+              <span *ngIf="otpVerified" class="otp-verified">✓ Verified</span>
+            </div>
+            <div *ngIf="emailError" class="field-error">{{ emailError }}</div>
+            <div *ngIf="emailChecking" class="email-checking">
+              <span class="spinner"></span> Checking email availability...
+            </div>
+
+            <!-- OTP Verification Section -->
+            <div *ngIf="otpSent && !otpVerified" class="otp-section">
+              <p class="otp-info">An OTP has been sent to {{ emailSentTo }}</p>
+              <div class="form-group">
+                <label for="otpCode">Enter OTP (6 digits) *</label>
+                <input
+                  type="text"
+                  id="otpCode"
+                  [(ngModel)]="otpCode"
+                  name="otpCode"
+                  placeholder="000000"
+                  maxlength="6"
+                  [disabled]="otpLoading"
+                  (keyup.enter)="verifyOTP()"
+                  required
+                />
+              </div>
+              <div *ngIf="otpErrorMessage" class="alert alert-error" style="margin-bottom: 1rem;">
+                {{ otpErrorMessage }}
+              </div>
+              <div class="otp-actions">
+                <button
+                  type="button"
+                  class="btn-verify-otp neon-btn"
+                  (click)="verifyOTP()"
+                  [disabled]="otpLoading || otpCode.length !== 6"
+                >
+                  {{ otpLoading ? 'Verifying...' : 'Verify OTP' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-resend-otp neon-btn"
+                  (click)="requestOTP()"
+                  [disabled]="resendTimer > 0 || otpLoading"
+                >
+                  {{ resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-change-email neon-btn"
+                  (click)="resetOTP()"
+                >
+                  Change Email
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="institution_contactno">Contact Number *</label>
+            <input
+              type="tel"
+              id="institution_contactno"
+              [(ngModel)]="institutionForm.institution_contactno"
+              name="institution_contactno"
+              placeholder="Enter your contact number"
+              required
+            />
+            <div *ngIf="institutionForm.institution_contactno && !/^[0-9]{10}$/.test(institutionForm.institution_contactno.replace(/[\s-]/g, ''))" class="field-error">Please enter a valid 10-digit contact number</div>
+          </div>
+
+          <div class="form-group">
+            <label for="websiteaddress">Website Address <span class="optional">(Optional)</span></label>
+            <input
+              type="url"
+              id="websiteaddress"
+              [(ngModel)]="institutionForm.websiteaddress"
+              name="websiteaddress"
+              placeholder="Enter your website (e.g., https://example.com)"
+            />
+          </div>
+        </div>
+
+        <!-- Location Section -->
+        <div class="form-section glass-card bento-card" style="margin-bottom: 30px;">
+          <h2 class="section-title">Location Details</h2>
+
+          <div class="form-group">
+            <label for="location_search">Institution Location (Search) *</label>
+            <div class="location-search-group">
+              <div class="search-input-wrapper grid-wrapper">
+                <input
+                  type="text"
+                  id="location_search"
+                  [(ngModel)]="locationSearchQuery"
+                  name="location_search"
+                  placeholder="e.g., 'Thodupuzha', 'Kochi', 'Thiruvananthapuram, Kerala'"
+                  (keyup.enter)="performLocationSearch()"
+                  required
+                />
+                <button
+                  type="button"
+                  class="btn-search-location neon-btn"
+                  (click)="performLocationSearch()"
+                  [disabled]="locationSearching || !locationSearchQuery.trim()"
+                >
+                  {{ locationSearching ? 'Searching...' : 'Search' }}
+                </button>
+              </div>
+              <p class="search-hint">💡 Tip: Search by city, district, or institution name (e.g., 'Kochi', 'Ernakulam', 'Santhigiri Medical College')</p>
+              <div *ngIf="locationSearching" class="location-loading">
+                <span class="spinner"></span> Searching locations...
+              </div>
+              <div *ngIf="locationResults.length > 0 && showLocationResults" class="location-results">
+                <div *ngFor="let location of locationResults" 
+                     class="location-result-item"
+                     (click)="selectLocation(location)">
+                  <div class="result-name">📍 {{ location.name }}</div>
+                  <div class="result-details">{{ location.display_name }}</div>
+                </div>
+              </div>
+              <div *ngIf="locationError" class="field-error">{{ locationError }}</div>
+            </div>
+
+            <!-- Selected Location Display -->
+            <div *ngIf="selectedLocation" class="selected-location">
+              <div class="location-info">
+                <strong>📍 Location Selected:</strong>
+                <p>{{ selectedLocation.display_name }}</p>
+                <p class="coordinates">Latitude: {{ institutionForm.latitude }}, Longitude: {{ institutionForm.longitude }}</p>
+              </div>
+              <button type="button" class="btn-clear-location neon-btn" (click)="clearLocation()">Change Location</button>
+            </div>
+
+            <div *ngIf="!selectedLocation" class="field-error">Please select a location</div>
+          </div>
+
+          <div class="form-group">
+            <label for="google_maps_link">Google Maps Link *</label>
+            <input
+              type="url"
+              id="google_maps_link"
+              [(ngModel)]="institutionForm.google_maps_link"
+              name="google_maps_link"
+              placeholder="Paste your Google Maps link (e.g., https://maps.google.com/...)"
+              required
+            />
+            <div *ngIf="institutionForm.google_maps_link === '' && institutionForm.google_maps_link !== undefined" class="field-error">Please enter your Google Maps link</div>
+          </div>
+        </div>
+
+        <!--Institution image Section -->
+        <div class="form-section glass-card bento-card" style="margin-bottom: 30px;">
+          <h2 class="section-title">Institution Image</h2>
+
+          <div class="form-group">
+            <label for="institution_image">Institution Image (JPG, PNG) <span class="optional">(Optional)</span></label>
+            <div class="file-upload">
+              <input
+                type="file"
+                id="institution_image"
+                (change)="onFileSelected($event)"
+                accept=".jpg,.jpeg,.png"
+                [disabled]="!otpVerified"
+              />
+              <div class="file-label">
+                <span *ngIf="!fileSelected" class="upload-text">Click to upload institution image</span>
+                <span *ngIf="fileSelected" class="upload-success">✓ File selected</span>
+              </div>
+            </div>
+
+            <!-- Image Preview -->
+            <div *ngIf="imagePreview" class="image-preview-container fade-in-up">
+              <img [src]="imagePreview" alt="Institution Image Preview" class="image-preview" />
+              <button type="button" class="btn-remove-image neon-btn" (click)="removeImage()">Remove Image</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Login Credentials Section -->
+        <div class="form-section glass-card bento-card" style="margin-bottom: 30px;">
+          <h2 class="section-title">Login Credentials</h2>
+
+          <div class="form-group">
+            <label for="username">Username *</label>
+            <input
+              type="text"
+              id="username"
+              [(ngModel)]="loginData.username"
+              name="username"
+              placeholder="Create a username"
+              (change)="checkUsernameAvailability()"
+              required
+            />
+            <div *ngIf="loginData.username === '' && loginData.username !== undefined" class="field-error">Please enter a username</div>
+            <div *ngIf="usernameError" class="field-error">{{ usernameError }}</div>
+            <div *ngIf="usernameChecking" class="username-checking">
+              <span class="spinner"></span> Checking username availability...
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input
+              type="password"
+              id="password"
+              [(ngModel)]="loginData.password"
+              name="password"
+              placeholder="Create a strong password (min 6 characters)"
+              minlength="6"
+              required
+            />
+            <div *ngIf="loginData.password && loginData.password.length < 6" class="field-error">Password must be at least 6 characters</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel neon-btn"
+            (click)="goBack()"
+            [disabled]="submitting"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            class="btn-submit neon-btn"
+            [disabled]="submitting || !otpVerified"
+          >
+            {{ submitting ? 'Registering...' : !otpVerified ? 'Verify Email to Continue' : 'Register' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Submission Modal -->
+  <div *ngIf="submitting || submitError || submitSuccess" class="modal-overlay" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <!-- Loading State -->
+      <div *ngIf="submitting && !submitError && !submitSuccess" class="modal-loading">
+        <div class="spinner"></div>
+        <h2>Registering Your Institution</h2>
+        <p>Please wait while we process your registration...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="submitError" class="modal-error">
+        <div class="error-icon">✕</div>
+        <h2>Registration Failed</h2>
+        <p class="error-message">{{ submitError }}</p>
+        <button type="button" class="btn-modal neon-btn" (click)="closeSubmitModal()">Try Again</button>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="submitSuccess" class="modal-success">
+        <div class="success-icon">✓</div>
+        <h2>Registration Successful!</h2>
+        <p class="success-message">{{ submitSuccess }}</p>
+        <button type="button" class="btn-modal btn-success neon-btn" (click)="goHome()">Continue to Login</button>
+      </div>
+    </div>
+  </div>
+</div>

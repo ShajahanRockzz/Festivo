@@ -1,0 +1,98 @@
+<section class="comp-details-section">
+  <div class="container fade-in-up">
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <h3>Loading Competition Details...</h3>
+    </div>
+
+    <div *ngIf="!isLoading && compDetails">
+      <div class="back-nav">
+        <!-- We use javascript:history.back() to just jump seamlessly back to the fest page they were on -->
+        <button class="btn-back neon-btn" (click)="router.navigate(['/participantmaster/festdetailsparticipant', compDetails.fest_id])">
+          <i class="fa-solid fa-arrow-left"></i> Back to Fest
+        </button>
+      </div>
+
+      <div class="content-grid">
+        
+        <!-- Left: Image & Quick Meta -->
+        <div class="left-column">
+          <div class="image-card bento-card">
+            <img [src]="getImageUrl(compDetails.image)" [alt]="compDetails.competition_name">
+          </div>
+
+          <div class="info-card meta-info bento-card">
+            <h3>Quick Overview</h3>
+            <ul class="info-list grid-wrapper">
+              <li>
+                <i class="fa-solid fa-users"></i>
+                <span class="val">
+                  <strong>Type</strong>
+                  {{ compDetails.type | titlecase }}
+                  <span *ngIf="compDetails.type === 'group'" style="font-size: 12px; color: #888;">
+                     ({{ compDetails.min_members }} - {{ compDetails.max_members }} Members)
+                  </span>
+                </span>
+              </li>
+              <li>
+                <i class="fa-solid fa-credit-card"></i>
+                <span class="val">
+                  <strong>Registration Fee</strong>
+                  Rs. {{ compDetails.reg_fee }}
+                </span>
+              </li>
+              <li>
+                <i class="fa-solid fa-user-check"></i>
+                <span class="val">
+                  <strong>Total Registrations</strong>
+                  {{ compDetails.registrationCount || 0 }}
+                </span>
+              </li>
+              <li>
+                <i class="fa-solid fa-calendar"></i>
+                <span class="val">
+                  <strong>Competition Date</strong>
+                  {{ compDetails.competition_date | date:'longDate' }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right: Description & Rules -->
+        <div class="main-content">
+          <div class="header-box">
+            <h1>{{ compDetails.competition_name }}</h1>
+            <div class="status-badge" [ngClass]="{'closed': isRegistrationClosed(compDetails.competition_date), 'open': !isRegistrationClosed(compDetails.competition_date)}">
+              {{ isRegistrationClosed(compDetails.competition_date) ? 'Registration Closed' : 'Registration Open' }}
+            </div>
+          </div>
+
+          <div class="about-section">
+            <h2>About The Competition</h2>
+            <div class="description-content">
+              {{ compDetails.description || 'No description provided by the organizer.' }}
+            </div>
+          </div>
+          
+          <div class="action-box">
+            <h3>Ready to Participate?</h3>
+            <p *ngIf="!isRegistrationClosed(compDetails.competition_date)">Secure your spot in this competition now.</p>
+            <p *ngIf="isRegistrationClosed(compDetails.competition_date)">We're sorry, but registration for this competition is closed.</p>
+            
+            <button *ngIf="!isRegistrationClosed(compDetails.competition_date)" class="btn-primary btn-large neon-btn" (click)="registerNow(compDetails.competition_id)">
+              Proceed to Register
+            </button>
+            <button *ngIf="isRegistrationClosed(compDetails.competition_date)" class="btn-locked btn-large neon-btn" disabled>
+              Closed
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+

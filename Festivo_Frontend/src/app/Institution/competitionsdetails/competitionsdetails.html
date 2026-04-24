@@ -1,0 +1,104 @@
+<div class="comp-details-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <h1>Competition Details</h1>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading competition details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && competitionDetails" class="content-wrapper">
+    <!-- Competition Overview Card -->
+    <div class="details-card main-info">
+      <div class="card-header">
+        <h2>{{ competitionDetails.competition_name }}</h2>
+        <span class="type-badge">{{ competitionDetails.type }}</span>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Date</span>
+          <span class="value">{{ formatDate(competitionDetails.competition_date) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Registration Fee</span>
+          <span class="value">₹{{ competitionDetails.reg_fee }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Registration Deadline</span>
+          <span class="value">{{ formatDate(competitionDetails.reg_date) }}</span>
+        </div>
+        <div class="info-item" *ngIf="competitionDetails.type === 'group'">
+          <span class="label">Group Limits</span>
+          <span class="value">{{ competitionDetails.min_members }} - {{ competitionDetails.max_members }} members</span>
+        </div>
+        <div class="info-item" *ngIf="competitionDetails.type === 'group'">
+          <span class="label">Group Leader Limit</span>
+          <span class="value">{{ competitionDetails.grouplimit }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Result Status</span>
+          <span class="value status-badge" [ngClass]="competitionDetails.res_status">{{ competitionDetails.res_status }}</span>
+        </div>
+      </div>
+
+      <div class="description-section">
+        <h3>Description</h3>
+        <p>{{ competitionDetails.description }}</p>
+      </div>
+    </div>
+
+    <!-- Participants Section -->
+    <div class="details-card participants-section">
+      <div class="card-header">
+        <h2>Registered Participants</h2>
+        <span class="count-badge">{{ participants.length }}</span>
+      </div>
+
+      <div *ngIf="isLoadingParticipants" class="loading-state small">
+        <div class="spinner"></div>
+      </div>
+
+      <div *ngIf="!isLoadingParticipants && participants.length === 0" class="empty-state">
+        <p>No participants registered for this competition yet.</p>
+      </div>
+
+      <div *ngIf="!isLoadingParticipants && participants.length > 0" class="table-responsive">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Participant / Group Name</th>
+              <th>Email</th>
+              <th>Contact No</th>
+              <th *ngIf="competitionDetails.type === 'group'">College ID Proof</th>
+              <th>Attendance</th>
+              <th>Registration Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of participants; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><strong>{{ p.participantname }}</strong></td>
+              <td>{{ p.email || p.participantemail || 'N/A' }}</td>
+              <td>{{ p.contact_no || 'N/A' }}</td>
+              <td *ngIf="competitionDetails.type === 'group'">
+                <a *ngIf="p.collegeidproof" [href]="'/uploads/' + p.collegeidproof" target="_blank" class="proof-link">View Proof</a>
+                <span *ngIf="!p.collegeidproof" class="empty-field">-</span>
+              </td>
+              <td>
+                <span class="attendance-badge" [ngClass]="p.attendance || 'pending'">
+                  {{ p.attendance || 'Pending' }}
+                </span>
+              </td>
+              <td>{{ formatDate(p.regdate) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

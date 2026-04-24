@@ -1,0 +1,131 @@
+<div class="institutionmaster-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <button class="toggle-sidebar-btn" (click)="toggleSidebar()" title="Toggle Sidebar">☰</button>
+      <div class="logo">
+        <span class="logo-icon">🎉</span>
+        <span class="logo-text">Festivo</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <button class="subscription-plan" [class.loading]="subscriptionLoading" (click)="navigateTo('/Institution/upgradeplan')" title="Click to upgrade plan">
+        <span class="plan-icon">📋</span>
+        <span class="plan-text">{{ subscriptionPlan }}</span>
+      </button>
+    </div>
+
+    <div class="header-right">
+      <div class="user-profile-container">
+        <button class="user-profile-btn" [class.open]="userProfileOpen" (click)="toggleUserProfile()" [title]="institutionFullName">
+          <span class="profile-icon">👤</span>
+          <span class="profile-name">{{ institutionName }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+
+        <div *ngIf="userProfileOpen" class="profile-dropdown">
+          <a routerLink="/Institution/home" class="dropdown-item">
+            <span class="icon">🏢</span> My Profile
+          </a>
+          <a routerLink="/Institution/upgradeplan" class="dropdown-item">
+            <span class="icon">⬆️</span> Upgrade Plan
+          </a>
+          <hr class="dropdown-divider" />
+          <button class="dropdown-item logout-btn" (click)="logout()">
+            <span class="icon">🚪</span> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" [class.collapsed]="!sidebarOpen">
+      <nav class="nav-menu">
+        <div *ngFor="let item of menuItems" class="nav-item">
+          <button
+            *ngIf="!item.submenu"
+            class="nav-link"
+            [routerLink]="item.route"
+            [queryParams]="item.queryParams"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+          </button>
+
+          <div *ngIf="item.submenu" class="nav-menu-group">
+            <button class="nav-link submenu-toggle" (click)="toggleMenu(item)">
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+              <span class="submenu-arrow" *ngIf="sidebarOpen" [class.expanded]="item.expanded">▼</span>
+            </button>
+
+            <div class="submenu" *ngIf="item.expanded && sidebarOpen">
+              <button
+                *ngFor="let subitem of item.submenu"
+                class="nav-link submenu-link"
+                [routerLink]="subitem.route"
+                [queryParams]="subitem.queryParams"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+              >
+                <span class="nav-icon">{{ subitem.icon }}</span>
+                <span class="nav-label">{{ subitem.label }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>About Festivo</h4>
+        <p>Festivo is a comprehensive event management platform for organizing and managing festivals and competitions.</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a routerLink="/Institution/home">Dashboard</a></li>
+          <li><a routerLink="/Institution/viewfest">View Fests</a></li>
+          <li><a routerLink="/Institution/profile">Profile</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <p>Email: <a href="mailto:support@festivo.com">support@festivo.com</a></p>
+        <p>Phone: <a href="tel:+918086596190">+91 808-659-6190</a></p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Follow Us</h4>
+        <div class="social-links">
+          <a href="#facebook" title="Facebook">f</a>
+          <a href="#twitter" title="Twitter">𝕏</a>
+          <a href="#instagram" title="Instagram">📷</a>
+          <a href="#linkedin" title="LinkedIn">in</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Festivo. All rights reserved. | Developed with ❤️ for event management</p>
+    </div>
+  </footer>
+</div>

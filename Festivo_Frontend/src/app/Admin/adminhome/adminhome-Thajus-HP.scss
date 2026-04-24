@@ -1,0 +1,154 @@
+.dashboard-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+  
+  .welcome-content {
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--text-pure);
+    }
+    p {
+      color: var(--text-slate);
+      margin: 0;
+    }
+  }
+}
+
+/* Stats grid uses .grid-wrapper globally */
+.stats-grid {
+  margin-bottom: 24px;
+}
+
+/* Base Bento Card applied globally, we just add specific stats styling */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    h3 {
+      font-size: 14px;
+      color: var(--text-slate);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+    
+    .icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+    }
+  }
+  
+  .card-body {
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-pure);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-slate);
+    }
+  }
+}
+
+.quick-actions-section {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  
+  h2 {
+    font-size: 18px;
+    margin-bottom: 24px;
+    color: var(--text-pure);
+  }
+  
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .action-btn {
+    /* Uses .neon-btn globally, overriding a bit for grid layout */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    gap: 12px;
+    min-height: 100px;
+    
+    .btn-icon {
+      font-size: 24px;
+    }
+    
+    .btn-text {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+}
+
+.info-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  
+  .info-card {
+    h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-subtle);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .label {
+          color: var(--text-slate);
+        }
+        
+        .value {
+          color: var(--text-pure);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+

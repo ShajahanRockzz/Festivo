@@ -1,0 +1,218 @@
+<div class="viewfest-container">
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" [class.closing]="isClosingModal" (click)="closeModal()">
+    <div class="modal-content" [class.closing]="isClosingModal" (click)="$event.stopPropagation()">
+      <div [ngClass]="'modal-message ' + (modalData.type === 'error' ? 'error-modal' : 'success-modal')">
+        <div class="modal-icon">{{ modalData.type === 'error' ? '❌' : '✓' }}</div>
+        <h2 class="modal-title">{{ modalData.title }}</h2>
+        <p class="modal-text">{{ modalData.message }}</p>
+        <div class="modal-actions">
+          <button class="modal-btn" (click)="closeModal()">Close</button>
+          <button 
+            *ngIf="modalData.type === 'error' && modalData.title === 'Subscription Required'" 
+            class="modal-btn btn-buy-plan" 
+            (click)="navigateToPlansBuy()"
+          >
+            Buy Plan Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div *ngIf="showConfirmModal" class="modal-overlay" [class.closing]="isClosingConfirmModal" (click)="closeConfirmModal()">
+    <div class="modal-content" [class.closing]="isClosingConfirmModal" (click)="$event.stopPropagation()">
+      <div class="modal-message error-modal">
+        <div class="modal-icon">⚠️</div>
+        <h2 class="modal-title">Confirm Deletion</h2>
+        <p class="modal-text">Are you sure you want to delete this festival? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="modal-btn" (click)="closeConfirmModal()">Cancel</button>
+          <button class="modal-btn btn-delete-confirm" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publish Confirm Modal -->
+  <div *ngIf="showPublishConfirmModal" class="modal-overlay" [class.closing]="isClosingPublishConfirmModal" (click)="cancelPublishFest()">
+    <div class="modal-content" [class.closing]="isClosingPublishConfirmModal" (click)="$event.stopPropagation()">
+      <div class="modal-message">
+        <div class="modal-icon">{{ festToPublish?.status === 'active' ? '🔒' : '🚀' }}</div>
+        <h2 class="modal-title">{{ festToPublish?.status === 'active' ? 'Unpublish Festival' : 'Publish Festival' }}</h2>
+        <p class="modal-text">
+          Are you sure you want to {{ festToPublish?.status === 'active' ? 'unpublish' : 'publish' }} 
+          <strong>"{{ festToPublish?.fest_name }}"</strong>?
+          <span *ngIf="festToPublish?.status !== 'active'">This will make the festival visible to all participants.</span>
+          <span *ngIf="festToPublish?.status === 'active'">This will hide the festival from participants.</span>
+        </p>
+        <div class="modal-actions">
+          <button class="modal-btn" (click)="cancelPublishFest()">Cancel</button>
+          <button class="modal-btn" [ngClass]="festToPublish?.status === 'active' ? 'btn-delete-confirm' : 'btn-buy-plan'" (click)="confirmPublishFest()">
+            {{ festToPublish?.status === 'active' ? 'Unpublish' : 'Publish' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>All Festivals</h1>
+        <p class="subtitle">View and manage all festivals created by your institution</p>
+      </div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-bar-container" *ngIf="fests.length > 0">
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="🔍 Search festivals by name, description, or type..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+      />
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="filter-controls" *ngIf="fests.length > 0">
+      <div class="filter-group">
+        <label for="sort-by">Sort by:</label>
+        <select 
+          id="sort-by"
+          class="filter-select" 
+          [(ngModel)]="sortBy"
+          (change)="onSortChange()"
+        >
+          <option value="name">Festival Name</option>
+          <option value="startdate">Starting Date</option>
+          <option value="status">Published Status</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort-order">{{ sortBy === 'status' ? 'Show:' : 'Order:' }}</label>
+        <select 
+          id="sort-order"
+          class="filter-select" 
+          [(ngModel)]="sortOrder"
+          (change)="onSortChange()"
+        >
+          <option *ngIf="sortBy !== 'status'" value="asc">Ascending</option>
+          <option *ngIf="sortBy !== 'status'" value="desc">Descending</option>
+          <option *ngIf="sortBy === 'status'" value="asc">Unpublished First</option>
+          <option *ngIf="sortBy === 'status'" value="desc">Published First</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading festivals...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && fests.length === 0" class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h2>No Festivals Found</h2>
+    <p>You haven't created any festivals yet. Start by creating your first festival.</p>
+    <a routerLink="/Institution/createfest" class="btn-create">Create First Festival</a>
+  </div>
+
+  <!-- No Search Results -->
+  <div *ngIf="!isLoading && fests.length > 0 && filteredFests.length === 0" class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h2>No Festivals Found</h2>
+    <p>No festivals match your search. Try with different keywords.</p>
+    <button (click)="searchQuery = ''; filterFests()" class="btn-create">Clear Search</button>
+  </div>
+
+  <!-- Fests Grid -->
+  <div *ngIf="!isLoading && filteredFests.length > 0" class="fests-grid">
+    <!-- Fest Card -->
+    <div *ngFor="let fest of filteredFests" [ngClass]="['fest-card', fest.status === 'active' ? 'card-published' : 'card-unpublished']">
+      <!-- Card Image -->
+      <div class="card-image-wrapper">
+        <img 
+          [src]="getImageUrl(fest.fest_image)" 
+          [alt]="fest.fest_name"
+          class="card-image"
+          (error)="onImageError($event)"
+        />
+        
+        <!-- Status Badge -->
+        <div [class]="'status-badge ' + getStatusBadgeClass(fest.status)">
+          {{ getStatusText(fest.status) }}
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <!-- Title -->
+        <h3 class="fest-title">{{ fest.fest_name }}</h3>
+
+        <!-- Description -->
+        <p class="fest-description">{{ fest.fest_description | slice:0:100 }}{{ fest.fest_description.length > 100 ? '...' : '' }}</p>
+
+        <!-- Dates -->
+        <div class="fest-dates">
+          <span class="date-label">📅 Duration:</span>
+          <span class="date-text">{{ formatDate(fest.startdate) }} - {{ formatDate(fest.enddate) }}</span>
+        </div>
+
+        <!-- Fest For -->
+        <div class="fest-for">
+          <span class="label">For:</span>
+          <span class="value">{{ fest.fest_for }}</span>
+        </div>
+      </div>
+
+      <!-- Card Actions (Dropdown Menu) -->
+      <div class="card-actions-container">
+        <details class="actions-dropdown">
+          <summary class="actions-toggle-btn">
+            <span class="btn-icon">⚙️</span>
+            <span class="btn-text">Manage Options</span>
+            <span class="chevron">▼</span>
+          </summary>
+          
+          <div class="dropdown-content">
+            <button class="dropdown-item btn-preview" (click)="previewFest(fest.fest_id)" title="Preview as attendee">
+              <span class="icon">👀</span> Preview
+            </button>
+            <button class="dropdown-item btn-edit" (click)="editFest(fest.fest_id)" title="Edit festival details">
+              <span class="icon">✏️</span> Edit
+            </button>
+            <button class="dropdown-item btn-view" (click)="viewFest(fest.fest_id)" title="View detailed information">
+              <span class="icon">👁️</span> View
+            </button>
+
+            <hr class="dropdown-divider">
+
+              <button *ngIf="fest.status === 'inactive'" class="dropdown-item btn-publish" (click)="publishFest(fest)" title="Publish this festival">
+                <span class="icon">🚀</span> Publish
+              </button>
+              <button *ngIf="fest.status === 'active'" class="dropdown-item btn-unpublish" (click)="publishFest(fest)" title="Unpublish this festival">                <span class="icon">🔒</span> Unpublish
+              </button>
+            <hr class="dropdown-divider">
+
+            <button class="dropdown-item btn-delete" (click)="deleteFest(fest.fest_id)" title="Delete festival">
+              <span class="icon">🗑️</span> Delete
+            </button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !isLoading" class="error-banner">
+    <span class="error-icon">❌</span>
+    <span class="error-text">{{ errorMessage }}</span>
+  </div>
+</div>

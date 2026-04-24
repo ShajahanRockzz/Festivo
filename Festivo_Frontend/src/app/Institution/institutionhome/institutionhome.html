@@ -1,0 +1,159 @@
+<div class="institutionhome-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-content">
+      <div class="spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div *ngIf="!isLoading" class="page-header">
+    <div class="header-content">
+      <h1>Welcome, {{ institutionName }}! 👋</h1>
+      <p class="subtitle">Here's an overview of your event management platform</p>
+    </div>
+    <button class="create-fest-btn" (click)="navigateToCreateFest()">
+      <span>➕</span> Create New Fest
+    </button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div *ngIf="!isLoading" class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon fest-icon">🎉</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Total Fests</h3>
+        <p class="stat-value">{{ stats.totalFests }}</p>
+        <p class="stat-detail">Active and upcoming events</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon competition-icon">🏆</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Competitions</h3>
+        <p class="stat-value">{{ stats.totalCompetitions }}</p>
+        <p class="stat-detail">Running competitions</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon registration-icon">📝</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Registrations</h3>
+        <p class="stat-value">{{ stats.totalRegistrations }}</p>
+        <p class="stat-detail">Total participants</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon revenue-icon">💰</div>
+      <div class="stat-info">
+        <h3 class="stat-label">Total Revenue</h3>
+        <p class="stat-value">₹{{ stats.totalRevenue | number }}</p>
+        <p class="stat-detail">from registrations</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div *ngIf="!isLoading" class="content-grid">
+    <!-- Recent Fests Section -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>🎉 Recent Fests</h2>
+      </div>
+
+      <div class="fest-cards">
+        <div *ngFor="let fest of topFests" class="fest-card">
+          <div class="fest-badge" [class.active]="fest.status === 'active'" [class.inactive]="fest.status !== 'active'">
+            {{ fest.status | uppercase }}
+          </div>
+          <h3 class="fest-name">{{ fest.fest_name }}</h3>
+          <p class="fest-date">
+            <span class="calendar-icon">📅</span>
+            {{ fest.startdate | date: 'MMM dd, yyyy' }}
+          </p>
+          <button class="fest-action-btn" [routerLink]="['/Institution/festdetails', fest.fest_id]">View Details</button>
+        </div>
+
+        <div *ngIf="topFests.length === 0" class="no-data-message">
+          <p>No fests created yet. Start by creating your first fest! 🚀</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Competitions Section -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>🏆 Recent Competitions</h2>
+      </div>
+
+      <div class="competition-cards">
+        <div *ngFor="let competition of topCompetitions" class="competition-card">
+          <div class="competition-header">
+            <h3 class="competition-name">{{ competition.competition_name || competition.comp_name }}</h3>
+            <span class="status-badge" [class.published]="competition.res_status === 'published'" [class.pending]="competition.res_status === 'pending'">
+              {{ competition.res_status }}
+            </span>
+          </div>
+          <p class="competition-date">
+            <span>📅</span> {{ competition.competition_date | date: 'MMM dd, yyyy' }}
+          </p>
+          <button class="competition-action-btn" [routerLink]="['/Institution/competitionsdetails', competition.competition_id || competition.comp_id]">Details</button>
+        </div>
+
+        <div *ngIf="topCompetitions.length === 0" class="no-data-message">
+          <p>No competitions created yet. Set up a competition to get started! 🎯</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Quick Actions -->
+  <div *ngIf="!isLoading" class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <button class="action-card" [routerLink]="['/Institution/createfest']">
+        <span class="action-icon">📝</span>
+        <span class="action-label">Create Fest</span>
+      </button>
+      <button class="action-card" [routerLink]="['/Institution/selectfest']" [queryParams]="{action: 'viewcompetitions'}">
+        <span class="action-icon">🎯</span>
+        <span class="action-label">Create Competition</span>
+      </button>
+      <button class="action-card" [routerLink]="['/Institution/studentparticipationreport']">
+        <span class="action-icon">📊</span>
+        <span class="action-label">View Analytics</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Getting Started Tips -->
+  <div *ngIf="!isLoading" class="tips-section">
+    <h2>💡 Getting Started Tips</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <span class="tip-number">1</span>
+        <h4>Create a Fest</h4>
+        <p>Set up your event or festival with dates, description, and categories.</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-number">2</span>
+        <h4>Add Competitions</h4>
+        <p>Create competitions within your fest with registration fees and rules.</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-number">3</span>
+        <h4>Manage Registrations</h4>
+        <p>Track participants, manage attendance, and communicate with teams.</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-number">4</span>
+        <h4>Announce Results</h4>
+        <p>Publish competition results and recognize winners publicly.</p>
+      </div>
+    </div>
+  </div>
+</div>

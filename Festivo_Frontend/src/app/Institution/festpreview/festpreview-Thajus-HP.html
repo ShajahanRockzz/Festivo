@@ -1,0 +1,226 @@
+<div class="festpreview-container fade-in-up">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back neon-btn" (click)="goBack()">← Back to Festivals</button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading festival details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && error" class="error-banner">
+    <p>⚠️ {{ error }}</p>
+    <button class="btn-retry neon-btn" (click)="goBack()">Go Back</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error && festData" class="festival-content">
+    <!-- Fest Header Section -->
+    <div class="fest-header">
+      <!-- Fest Image -->
+      <div class="fest-image-container fade-in-up">
+        <img [src]="getFestImagePath()" [alt]="festData.fest_name" class="fest-image">
+        <span class="status-badge" [ngClass]="getStatusBadgeClass()">
+          {{ getStatusLabel() }}
+        </span>
+      </div>
+
+      <!-- Fest Title & Info -->
+      <div class="fest-info-header">
+        <div class="fest-title-row">
+          <h1 class="fest-name">{{ festData.fest_name }}</h1>
+        </div>
+
+        <div class="fest-meta">
+          <div class="meta-item">
+            <span class="meta-icon">📅</span>
+            <div class="meta-content">
+              <strong>Start Date</strong>
+              <p>{{ festData.startdate | date: 'MMM dd, yyyy' }}</p>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-icon">📆</span>
+            <div class="meta-content">
+              <strong>End Date</strong>
+              <p>{{ festData.enddate | date: 'MMM dd, yyyy' }}</p>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-icon">👥</span>
+            <div class="meta-content">
+              <strong>For</strong>
+              <p>{{ festData.fest_for || 'All' | titlecase }}</p>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-icon">🏆</span>
+            <div class="meta-content">
+              <strong>Competitions</strong>
+              <p>{{ competitions.length }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fest Description Section -->
+    <div class="fest-section">
+      <h2 class="section-title">📝 About the Festival</h2>
+      <p class="fest-description" *ngIf="festData.fest_description">
+        {{ festData.fest_description }}
+      </p>
+      <p class="no-description" *ngIf="!festData.fest_description">
+        No description available for this festival.
+      </p>
+
+      <!-- Brochure Download -->
+      <button 
+        *ngIf="festData.brochure"
+        class="btn-download-brochure neon-btn"
+        (click)="downloadBrochure()"
+        title="Download festival brochure">
+        📄 Download Brochure
+      </button>
+    </div>
+
+    <!-- Institution Details Section -->
+    <div class="fest-section" *ngIf="institutionData">
+      <h2 class="section-title">🏢 Institution Details</h2>
+      
+      <div class="institution-card bento-card">
+        <!-- Institution Image & Name -->
+        <div class="institution-header">
+          <img 
+            [src]="getInstitutionImagePath()"
+            [alt]="institutionData.institution_name"
+            class="institution-image"
+            (error)="onInstitutionImageError($event)">
+          <div class="institution-name-section">
+            <h3>{{ institutionData.institution_name }}</h3>
+            <p class="institution-type">Educational Institution</p>
+          </div>
+        </div>
+
+        <!-- Institution Details Grid -->
+        <div class="institution-details">
+          <div class="detail-item">
+            <span class="detail-icon">📍</span>
+            <div class="detail-content">
+              <strong>Address</strong>
+              <p>{{ institutionData.institution_address }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-icon">📧</span>
+            <div class="detail-content">
+              <strong>Email</strong>
+              <p>
+                <a [href]="'mailto:' + institutionData.institution_email">
+                  {{ institutionData.institution_email }}
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-icon">📞</span>
+            <div class="detail-content">
+              <strong>Contact</strong>
+              <p>
+                <a [href]="'tel:' + institutionData.institution_contactno">
+                  {{ institutionData.institution_contactno }}
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="institutionData.websiteaddress">
+            <span class="detail-icon">🌐</span>
+            <div class="detail-content">
+              <strong>Website</strong>
+              <p>
+                <a 
+                  [href]="institutionData.websiteaddress" 
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  Visit Website →
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="institutionData.google_maps_link">
+            <span class="detail-icon">🗺️</span>
+            <div class="detail-content">
+              <strong>Location</strong>
+              <p>
+                <a 
+                  [href]="institutionData.google_maps_link" 
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  View on Maps →
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Competitions Section -->
+    <div class="fest-section" *ngIf="competitions.length > 0">
+      <h2 class="section-title">🏅 Competitions ({{ competitions.length }})</h2>
+      
+      <div class="competitions-list grid-wrapper">
+        <div class="competition-item" *ngFor="let comp of competitions">
+          <div class="comp-header">
+            <h4>{{ comp.comp_name }}</h4>
+            <span class="comp-type" [ngClass]="comp.type">
+              {{ comp.type | titlecase }}
+            </span>
+          </div>
+
+          <img 
+            [src]="getCompetitionImagePath(comp.comp_image)" 
+            [alt]="comp.comp_name" 
+            class="comp-image">
+
+          <p class="comp-description" *ngIf="comp.description">
+            {{ comp.description }}
+          </p>
+
+          <div class="comp-details">
+            <span class="comp-detail" *ngIf="comp.competition_date">
+              📅 {{ comp.competition_date | date: 'MMM dd, yyyy' }}
+            </span>
+            <span class="comp-detail" *ngIf="comp.type === 'group'">
+              👥 {{ comp.min_members }}-{{ comp.max_members }} members
+            </span>
+            <span class="comp-detail" *ngIf="comp.type === 'single'">
+              👤 Individual
+            </span>
+            <span class="comp-detail" *ngIf="comp.reg_fee">
+              💰 ₹{{ comp.reg_fee }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Competitions -->
+    <div class="fest-section" *ngIf="competitions.length === 0">
+      <div class="empty-state">
+        <p>No competitions scheduled for this festival yet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+

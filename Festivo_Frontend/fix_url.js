@@ -1,0 +1,1 @@
+const fs=require('fs'); let c=fs.readFileSync('src/app/Admin/totalrevenue/totalrevenue.ts','utf8'); c=c.replace('http://localhost:5000', 'http://localhost:3000'); fs.writeFileSync('src/app/Admin/totalrevenue/totalrevenue.ts', c);

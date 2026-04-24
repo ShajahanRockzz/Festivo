@@ -1,0 +1,91 @@
+<!-- Header/Navigation -->
+<header class="guest-header">
+  <div class="navbar">
+    <div class="navbar-container fade-in-up">
+      <div class="navbar-logo">
+        <h1>🎉 Festivo</h1>
+      </div>
+      <nav class="navbar-menu">
+        <ul class="nav-list grid-wrapper">
+          <li><a routerLink="/guestmaster/guesthome" class="nav-link">Home</a></li>
+          <li><a routerLink="/guestmaster/viewallfestsguest" class="nav-link">Fests</a></li>
+          <li><a routerLink="/guestmaster/about" class="nav-link">About</a></li>
+          <li><a routerLink="/guestmaster/contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="navbar-buttons">
+        <button class="btn-login neon-btn" (click)="goToLogin()">Login</button>
+        <button class="btn-register neon-btn" (click)="openRegisterModal()">Register</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="guest-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Register Modal -->
+<div class="modal-overlay" *ngIf="showRegisterModal" (click)="closeRegisterModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Choose Registration Type</h2>
+      <button class="close-btn neon-btn" (click)="closeRegisterModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-subtitle">Select how you would like to register with Festivo</p>
+      <div class="registration-options">
+        <div class="register-option participant" (click)="registerAsParticipant()">
+          <div class="option-icon">👤</div>
+          <h3>Participant</h3>
+          <p>Register to participate in festivals and events</p>
+          <button class="register-option-btn neon-btn">Register as Participant</button>
+        </div>
+        <div class="register-option institution" (click)="registerAsInstitution()">
+          <div class="option-icon">🏛️</div>
+          <h3>Institution</h3>
+          <p>Register your institution to host festivals</p>
+          <button class="register-option-btn neon-btn">Register as Institution</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="guest-footer">
+  <div class="footer-container fade-in-up">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Festivo</h3>
+        <p>Your ultimate fest management platform for seamless event coordination.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a routerLink="/guestmaster/guesthome">Home</a></li>
+          <li><a routerLink="/guestmaster/viewallfestsguest">Festivals</a></li>
+          <li><a routerLink="/guestmaster/about">About Us</a></li>
+          <li><a routerLink="/guestmaster/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Follow Us</h4>
+        <ul>
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">Instagram</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Info</h4>
+        <p>Email: shajahan2rockzz@gmail.com</p>
+        <p>Phone: +91-7736715794</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Festivo. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>

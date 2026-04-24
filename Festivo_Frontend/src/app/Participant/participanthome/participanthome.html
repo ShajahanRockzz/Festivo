@@ -1,0 +1,79 @@
+<!-- Hero Section -->
+<section class="hero-section" id="home">
+  <div class="hero-content">
+    <h1>Welcome to Festivo</h1>
+    <p>Discover and participate in amazing festivals and events happening around you</p>
+    <div class="hero-buttons">
+      <button (click)="browseFestivals()" class="btn-primary neon-btn">Browse Festivals</button>
+      <button class="btn-secondary neon-btn">Learn More</button>
+    </div>
+  </div>
+</section>
+
+<!-- Available Festivals Section -->
+<section class="festivals-section" id="fests">
+  <div class="container">
+    <h2>Available Festivals</h2>
+    <div class="festivals-filter">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Cultural</button>
+      <button class="filter-btn">Technical</button>
+      <button class="filter-btn">Gaming</button>
+    </div>
+
+    <div class="festivals-grid">
+      <!-- Fest Card 1 -->
+      <div class="fest-card" *ngFor="let fest of fests">
+        <div class="fest-image">
+          <img [src]="getFestImage(fest.fest_image)" [alt]="fest.fest_name">
+          <span class="fest-category" [ngClass]="'category-' + fest.category_name"> {{ fest.category_name || 'General' }}</span>
+        </div>
+        <div class="fest-info">
+          <h3>{{ fest.fest_name }}</h3>
+          <p class="fest-description">{{ fest.fest_description }}</p>
+          <div class="fest-details">
+            <div class="detail-item">
+              <span class="label">Dates:</span>
+              <span class="value">{{ fest.startdate | date: 'MMM dd' }} - {{ fest.enddate | date: 'MMM dd' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Institution:</span>
+              <span class="value">{{ fest.institution_name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Events:</span>
+              <span class="value">{{ fest.event_count }}</span>
+            </div>
+          </div>
+          <button class="btn-view-details" (click)="viewFestDetails(fest.fest_id)">View Details</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Festivals Message -->
+    <div class="no-fests" *ngIf="fests.length === 0">
+      <p>No festivals available at the moment. Check back soon!</p>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+  <div class="container">
+    <h2>About Festivo</h2>
+    <p>Festivo is an online fest and event management platform designed to simplify how institutions plan, publish, and manage their events. Whether you're attending a cultural fest, technical competition, or gaming event, Festivo brings it all to your fingertips.</p>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+  <div class="cta-content">
+    <h2>Stay Connected &amp; Compete</h2>
+    <p>Discover more events and track your participation</p>
+    <button class="btn-register-large neon-btn" (click)="browseFestivals()">Explore Fests</button>
+  </div>
+</section>
+
+
+
+

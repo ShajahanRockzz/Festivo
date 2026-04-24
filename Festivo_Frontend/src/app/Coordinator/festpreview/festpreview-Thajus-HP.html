@@ -1,0 +1,128 @@
+<div class="festpreview-container fade-in-up">
+	<div class="page-header">
+		<button class="btn-back neon-btn" (click)="goBack()">← Back to Competitions</button>
+	</div>
+
+	<div *ngIf="isLoading" class="loading-state">
+		<div class="spinner"></div>
+		<p>Loading festival details...</p>
+	</div>
+
+	<div *ngIf="!isLoading && errorMessage" class="error-banner">
+		<p>⚠️ {{ errorMessage }}</p>
+		<button class="btn-retry neon-btn" (click)="goBack()">Go Back</button>
+	</div>
+
+	<div *ngIf="!isLoading && fest" class="festival-content">
+		<div class="fest-header">
+			<div class="fest-image-container fade-in-up">
+				<img [src]="getImageUrl(fest.fest_image)" [alt]="fest.fest_name" class="fest-image">
+				<span class="status-badge" [ngClass]="getStatusBadgeClass()">
+					{{ getStatusLabel() }}
+				</span>
+			</div>
+
+			<div class="fest-info-header">
+				<div class="fest-title-row">
+					<h1 class="fest-name">{{ fest.fest_name }}</h1>
+				</div>
+
+				<div class="fest-meta">
+					<div class="meta-item">
+						<span class="meta-icon">📅</span>
+						<div class="meta-content">
+							<strong>Start Date</strong>
+							<p>{{ fest.startdate | date: 'MMM dd, yyyy' }}</p>
+						</div>
+					</div>
+
+					<div class="meta-item">
+						<span class="meta-icon">📆</span>
+						<div class="meta-content">
+							<strong>End Date</strong>
+							<p>{{ fest.enddate | date: 'MMM dd, yyyy' }}</p>
+						</div>
+					</div>
+
+					<div class="meta-item">
+						<span class="meta-icon">👥</span>
+						<div class="meta-content">
+							<strong>For</strong>
+							<p>{{ fest.fest_for || 'All' | titlecase }}</p>
+						</div>
+					</div>
+
+					<div class="meta-item">
+						<span class="meta-icon">🏆</span>
+						<div class="meta-content">
+							<strong>Competitions</strong>
+							<p>{{ competitions.length }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="fest-section">
+			<h2 class="section-title">📝 About the Festival</h2>
+			<p class="fest-description" *ngIf="fest.fest_description">
+				{{ fest.fest_description }}
+			</p>
+			<p class="no-description" *ngIf="!fest.fest_description">
+				No description available for this festival.
+			</p>
+		</div>
+
+		<div class="fest-section" *ngIf="competitions.length > 0">
+			<h2 class="section-title">🏅 Competitions ({{ competitions.length }})</h2>
+
+			<div class="competitions-list grid-wrapper">
+				<div class="competition-item" *ngFor="let comp of competitions">
+					<div class="comp-header">
+						<h4>{{ comp.comp_name }}</h4>
+						<span class="comp-type" [ngClass]="comp.type">
+							{{ comp.type | titlecase }}
+						</span>
+					</div>
+
+					<img
+						[src]="getCompetitionImagePath(comp.comp_image)"
+						[alt]="comp.comp_name"
+						class="comp-image">
+
+					<p class="comp-description" *ngIf="comp.description">
+						{{ comp.description }}
+					</p>
+
+					<div class="comp-details">
+						<span class="comp-detail" *ngIf="comp.competition_date">
+							📅 {{ comp.competition_date | date: 'MMM dd, yyyy' }}
+						</span>
+						<span class="comp-detail" *ngIf="comp.type === 'group'">
+							👥 {{ comp.min_members }}-{{ comp.max_members }} members
+						</span>
+						<span class="comp-detail" *ngIf="comp.type === 'single'">
+							👤 Individual
+						</span>
+						<span class="comp-detail" *ngIf="comp.reg_fee">
+							💰 ₹{{ comp.reg_fee }}
+						</span>
+					</div>
+					<button
+						*ngIf="isAssignedCompetition(comp.comp_id)"
+						class="btn-assigned neon-btn"
+						(click)="goToAssignedCompetitions()"
+					>
+						View Assigned Competitions
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="fest-section" *ngIf="competitions.length === 0">
+			<div class="empty-state">
+				<p>No competitions scheduled for this festival yet.</p>
+			</div>
+		</div>
+	</div>
+</div>

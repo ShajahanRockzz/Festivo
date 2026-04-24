@@ -1,0 +1,68 @@
+<div class="fests-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <h1>Assigned Fests</h1>
+    <p>View and manage fests assigned to you</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading fests...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && assignedFests.length === 0">
+    <div class="empty-icon">📭</div>
+    <h2>No Fests Assigned</h2>
+    <p>You don't have any fests assigned yet. Contact your institution coordinator.</p>
+  </div>
+
+  <!-- Fests Grid -->
+  <div class="fests-grid" *ngIf="!isLoading && assignedFests.length > 0">
+    <div class="fest-card" *ngFor="let item of assignedFests">
+      <!-- Fest Image -->
+      <div class="fest-image">
+        <img [src]="getImageUrl(item.fest.fest_image)" [alt]="item.fest.fest_name" />
+        <div class="fest-status" [class.active]="item.fest.status === 'active'" [class.inactive]="item.fest.status === 'inactive'">
+          {{ item.fest.status | uppercase }}
+        </div>
+      </div>
+
+      <!-- Fest Details -->
+      <div class="fest-details">
+        <h2 class="fest-name">{{ item.fest.fest_name }}</h2>
+        
+        <div class="fest-meta">
+          <div class="meta-item">
+            <span class="meta-icon">📅</span>
+            <div class="meta-content">
+              <small>Duration</small>
+              <p>{{ item.fest.startdate | date:'MMM dd' }} - {{ item.fest.enddate | date:'MMM dd, yyyy' }}</p>
+            </div>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">🏆</span>
+            <div class="meta-content">
+              <small>Competitions</small>
+              <p>{{ item.competitionCount }} assigned</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="fest-description" *ngIf="item.fest.fest_description">{{ (item.fest.fest_description | slice:0:150) }}{{ item.fest.fest_description.length > 150 ? '...' : '' }}</p>
+
+        <!-- Action Button -->
+        <div class="fest-actions">
+          <button class="btn-view-competitions" (click)="viewCompetitions(item.fest.fest_id)">
+            <span>View Competitions</span>
+            <span class="arrow">→</span>
+          </button>
+          <button class="btn-view-details" (click)="viewDetails(item.fest.fest_id)">
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,244 @@
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 32px;
+  h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+}
+
+.search-container {
+  margin-bottom: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 4px 16px;
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-pure);
+    padding: 12px 0;
+    font-family: inherit;
+    font-size: 15px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--text-slate);
+    }
+  }
+
+  .search-clear {
+    cursor: pointer;
+    color: var(--text-slate);
+    padding: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #ef4444;
+    }
+  }
+}
+
+.category-card {
+  padding: 0; // Override global bento padding for full-bleed image
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .card-image-container {
+    height: 180px;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-subtle);
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+  }
+
+  &:hover .card-image {
+    transform: scale(1.05);
+  }
+
+  .card-content {
+    padding: 20px;
+    flex-grow: 1;
+
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .card-description {
+      color: var(--text-slate);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+      /* Truncate to 3 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-subtle);
+    gap: 12px;
+
+    button {
+      flex: 1;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-pure);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #0ea5e9;
+        color: #0ea5e9;
+      }
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: #ef4444;
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+      }
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  
+  .neon-text {
+    color: #0ea5e9;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-shadow: 0 0 8px rgba(14, 165, 233, 0.5);
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--text-slate);
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: #0ea5e9;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.warning-icon { color: #f59e0b; }
+.error-modal .modal-icon { color: #ef4444; }
+.success-modal .modal-icon { color: #22c55e; }
+
+.modal-title {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.modal-message, .modal-text {
+  color: var(--text-slate);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 16px;
+  
+  button {
+    flex: 1;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-pure);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+.modal-btn {
+  width: 100%;
+}

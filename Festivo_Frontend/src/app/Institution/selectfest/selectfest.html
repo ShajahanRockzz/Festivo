@@ -1,0 +1,68 @@
+<div class="selectfest-container">
+  <div class="selectfest-header">
+    <h1>Select Festival</h1>
+    <p>Choose a festival to manage competitions and results</p>
+  </div>
+
+  <div class="selectfest-content">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading festivals...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-state">
+      <p class="error-message">❌ {{ error }}</p>
+      <button (click)="loadFests()" class="btn-retry">Retry Fetching Data</button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && fests.length === 0 && !error" class="empty-state">  
+      <p>No festivals found. Create a festival first to begin.</p>
+      <button (click)="router.navigate(['/Institution/institutionhome'])" class="btn-create">
+        Create Your First Festival
+      </button>
+    </div>
+
+    <!-- Fests Grid -->
+    <div *ngIf="!loading && fests.length > 0" class="fests-grid">
+      <div
+        *ngFor="let fest of fests"
+        class="fest-card"
+        (click)="selectFest(fest)"
+      >
+        <!-- Fest Image -->
+        <div class="fest-image-container">
+          <img [src]="getFestImagePath(fest)" [alt]="fest.fest_name" class="fest-image" />
+          
+          <div class="fest-card-header">
+            <h2>{{ fest.fest_name }}</h2>
+            <span class="fest-status" [ngClass]="fest.status === 'active' ? 'published' : 'unpublished'">
+              {{ fest.status === 'active' ? 'Published' : 'Draft' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="fest-card-info">
+          <div class="info-row">
+            <span class="label">Duration:</span>
+            <span class="value">{{ fest.startdate | date: 'MMM dd, yyyy' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Details:</span>
+            <span class="value">{{ fest.fest_description | slice: 0: 100 }}{{ fest.fest_description?.length > 100 ? '...' : '' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Events:</span>
+            <span class="value">{{ fest.competitionCount || 0 }} competitions</span>
+          </div>
+        </div>
+
+        <div class="fest-card-action">
+          <span class="action-text">Select Festival <span class="arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

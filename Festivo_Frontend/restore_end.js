@@ -1,0 +1,1 @@
+const fs = require('fs'); const file = 'src/app/Guest/festdetailsguest/festdetailsguest.ts'; let content = fs.readFileSync(file, 'utf8'); content += '\n  }\n\n  getBrochureUrl(fileName: string): string {\n    return \'http://localhost:3000/uploads/\' + fileName;\n  }\n}\n'; fs.writeFileSync(file, content);

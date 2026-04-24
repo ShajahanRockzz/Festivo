@@ -1,0 +1,92 @@
+<div class="competitions-container">
+  <!-- Back Button -->
+  <button class="btn-back" (click)="goBack()">
+    <span class="arrow">←</span>
+    <span>Back to Fests</span>
+  </button>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading competitions...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading" class="content">
+    <!-- Fest Header -->
+    <div class="fest-header" *ngIf="fest">
+      <div class="fest-header-image">
+        <img [src]="getImageUrl(fest.fest_image)" [alt]="fest.fest_name" />
+      </div>
+      <div class="fest-header-content">
+        <h1>{{ fest.fest_name }}</h1>
+        <p class="fest-dates">
+          📅 {{ fest.startdate | date:'MMM dd, yyyy' }} - {{ fest.enddate | date:'MMM dd, yyyy' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="competitions.length === 0">
+      <div class="empty-icon">🏆</div>
+      <h2>No Competitions Assigned</h2>
+      <p>You don't have any competitions assigned for this fest.</p>
+    </div>
+
+    <!-- Competitions List -->
+    <div class="competitions-list" *ngIf="competitions.length > 0">
+      <h2>Assigned Competitions</h2>
+      <div class="competitions-grid">
+        <div class="competition-card" *ngFor="let competition of competitions">
+          <!-- Competition Image -->
+          <div class="comp-image" *ngIf="competition.image">
+            <img [src]="getCompetitionImageUrl(competition.image)" [alt]="competition.competition_name" />
+          </div>
+          <div class="comp-image placeholder" *ngIf="!competition.image">
+            <img [src]="getCompetitionImageUrl('')" [alt]="'Default competition image'" />
+          </div>
+
+          <!-- Competition Details -->
+          <div class="comp-details">
+            <h3 class="comp-name">{{ competition.competition_name }}</h3>
+
+            <!-- Status Badge -->
+            <div class="comp-status" [style.background-color]="getStatusColor(competition.res_status)">
+              {{ competition.res_status | uppercase }}
+            </div>
+
+            <!-- Competition Meta -->
+            <div class="comp-meta">
+              <div class="meta-item">
+                <span class="meta-label">Type</span>
+                <span class="meta-value">{{ competition.type | uppercase }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Date</span>
+                <span class="meta-value">{{ competition.competition_date | date:'MMM dd' }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Fee</span>
+                <span class="meta-value">₹{{ competition.reg_fee }}</span>
+              </div>
+            </div>
+
+            <!-- Team Requirements -->
+            <div class="comp-requirements" *ngIf="competition.type === 'group'">
+              <span class="req-badge">{{ competition.min_members }}-{{ competition.max_members }} members</span>
+            </div>
+
+            <!-- Description -->
+            <p class="comp-description" *ngIf="competition.description">{{ (competition.description | slice:0:100) }}{{ competition.description.length > 100 ? '...' : '' }}</p>
+
+            <!-- Action Buttons -->
+            <div class="comp-actions">
+              <button class="btn-primary" (click)="viewCompetitionDetails(competition.competition_id)">View Details</button>
+              <button class="btn-secondary" (click)="viewParticipants(competition.competition_id)">Participants</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
